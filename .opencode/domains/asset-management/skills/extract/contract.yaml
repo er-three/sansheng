@@ -1,0 +1,40 @@
+slot: extract
+name: 兵部
+description: 并行资产提取，5个文件必须全部存在才算通过
+
+inputs:
+  - name: module_name
+    type: string
+    required: true
+
+outputs:
+  - name: ui_yaml
+    path: "openspec/specs/{module_name}/{module_name}.ui.yaml"
+  - name: logic_ts
+    path: "openspec/specs/{module_name}/{module_name}.logic.ts"
+  - name: infrastructure_yaml
+    path: "openspec/specs/{module_name}/{module_name}.infrastructure.yaml"
+  - name: architecture_md
+    path: "openspec/specs/{module_name}/{module_name}.architecture.md"
+  - name: design_spec_md
+    path: "openspec/specs/{module_name}/design-spec.md"
+
+verify:
+  - type: file_exists
+    path: "openspec/specs/{module_name}/{module_name}.ui.yaml"
+    error_msg: "ui.yaml 不存在，UI结构提取失败"
+  - type: file_exists
+    path: "openspec/specs/{module_name}/{module_name}.logic.ts"
+    error_msg: "logic.ts 不存在，业务逻辑提取失败"
+  - type: file_exists
+    path: "openspec/specs/{module_name}/{module_name}.infrastructure.yaml"
+    error_msg: "infrastructure.yaml 不存在，基础设施提取失败"
+  - type: file_exists
+    path: "openspec/specs/{module_name}/{module_name}.architecture.md"
+    error_msg: "architecture.md 不存在，架构设计提取失败"
+  - type: file_exists
+    path: "openspec/specs/{module_name}/design-spec.md"
+    error_msg: "design-spec.md 不存在，设计规范提取失败"
+
+depends_on: [scan]
+retry_max: 2

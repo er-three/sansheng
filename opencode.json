@@ -1,0 +1,184 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+
+  "model": "anthropic/claude-opus-4-6",
+  "small_model": "anthropic/claude-haiku-4-5",
+  "default_agent": "huangdi",
+
+  "agent": {
+    "huangdi": {
+      "description": "皇帝：战略决策者，设定目标、掌控全局、最终验收",
+      "mode": "primary",
+      "model": "anthropic/claude-opus-4-6",
+      "prompt": "{file:.opencode/agents/huangdi.md}",
+      "temperature": 0.2,
+      "steps": 50,
+      "permission": {
+        "task": { "*": "allow" },
+        "skill": { "*": "allow" }
+      }
+    },
+    "zhongshu": {
+      "description": "中书省：规划任务，制定六部执行计划",
+      "mode": "subagent",
+      "model": "anthropic/claude-opus-4-6",
+      "prompt": "{file:.opencode/agents/zhongshu.md}",
+      "temperature": 0.1,
+      "steps": 20,
+      "permission": {
+        "edit": "deny",
+        "bash": "deny"
+      }
+    },
+    "menxia": {
+      "description": "门下省：审核计划和执行结果，有权否决，通过才能继续",
+      "mode": "subagent",
+      "model": "anthropic/claude-opus-4-6",
+      "prompt": "{file:.opencode/agents/menxia.md}",
+      "temperature": 0.0,
+      "steps": 10,
+      "permission": {
+        "edit": "deny",
+        "bash": "deny"
+      }
+    },
+    "shangshu": {
+      "description": "尚书省：执行调度者，按审核通过的计划逐步调用六部代理",
+      "mode": "subagent",
+      "model": "anthropic/claude-haiku-4-5",
+      "prompt": "{file:.opencode/agents/shangshu.md}",
+      "temperature": 0.0,
+      "steps": 100,
+      "permission": {
+        "task": { "yibu": "allow", "hubu": "allow", "libu": "allow", "bingbu": "allow", "xingbu": "allow", "gongbu": "allow", "kubu": "allow" },
+        "skill": { "*": "allow" }
+      }
+    },
+
+    "yibu": {
+      "description": "吏部：档案官员，负责代码扫描与信息采集。掌管 read、glob、grep 工具。",
+      "mode": "subagent",
+      "model": "anthropic/claude-haiku-4-5",
+      "prompt": "{file:.opencode/agents/yibu.md}",
+      "temperature": 0.0,
+      "steps": 40,
+      "permission": {
+        "edit": "deny",
+        "bash": "deny"
+      }
+    },
+
+    "hubu": {
+      "description": "户部：工商官员，负责外部资源整合与全球审计。掌管 webfetch、websearch 工具。",
+      "mode": "subagent",
+      "model": "anthropic/claude-haiku-4-5",
+      "prompt": "{file:.opencode/agents/hubu.md}",
+      "temperature": 0.0,
+      "steps": 20,
+      "permission": {
+        "edit": "deny",
+        "bash": "deny"
+      }
+    },
+
+    "libu": {
+      "description": "礼部：仪式官员，负责工作流协调与工具技能调度。掌管 skill、todowrite 工具。",
+      "mode": "subagent",
+      "model": "anthropic/claude-haiku-4-5",
+      "prompt": "{file:.opencode/agents/libu.md}",
+      "temperature": 0.0,
+      "steps": 30,
+      "permission": {
+        "edit": "deny",
+        "bash": "deny"
+      }
+    },
+
+    "bingbu": {
+      "description": "兵部：将领官员，负责战术执行与系统测试。掌管 bash 工具。",
+      "mode": "subagent",
+      "model": "anthropic/claude-sonnet-4-6",
+      "prompt": "{file:.opencode/agents/bingbu.md}",
+      "temperature": 0.0,
+      "steps": 50,
+      "permission": {
+        "edit": "deny",
+        "write": "deny",
+        "webfetch": "deny",
+        "websearch": "deny"
+      }
+    },
+
+    "xingbu": {
+      "description": "刑部：审判官员，负责代码审查与质量把关。掌管 read、semantic_grep 工具（AST语义审查）。",
+      "mode": "subagent",
+      "model": "anthropic/claude-opus-4-6",
+      "prompt": "{file:.opencode/agents/xingbu.md}",
+      "temperature": 0.0,
+      "steps": 30,
+      "permission": {
+        "edit": "deny",
+        "bash": "deny"
+      }
+    },
+
+    "gongbu": {
+      "description": "工部：工程官员，负责代码实现与基础设施建设。掌管 edit、write、read、verify_edit_context 工具（Hash-Anchored Edit）。",
+      "mode": "subagent",
+      "model": "anthropic/claude-sonnet-4-6",
+      "prompt": "{file:.opencode/agents/gongbu.md}",
+      "temperature": 0.1,
+      "steps": 80,
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "bash": "deny"
+      }
+    },
+
+    "kubu": {
+      "description": "库部：档案官员，负责 OpenSpec 规范化和资产持久化。掌管 openspec-write、openspec-validate 工具。",
+      "mode": "subagent",
+      "model": "anthropic/claude-haiku-4-5",
+      "prompt": "{file:.opencode/agents/kubu.md}",
+      "temperature": 0.0,
+      "steps": 25,
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "bash": "deny"
+      }
+    }
+  },
+
+  "command": {
+    "switch-domain": {
+      "description": "切换六部技能领域",
+      "template": "调用 switch_domain 工具切换到 $ARGUMENTS 领域，然后调用 pipeline_status 显示新流水线",
+      "agent": "huangdi"
+    },
+    "status": {
+      "description": "查看当前六部流水线状态",
+      "template": "调用 pipeline_status 工具显示当前流水线状态",
+      "agent": "huangdi"
+    },
+    "start": {
+      "description": "启动三省六部流程",
+      "template": "作为皇帝，接收以下任务目标并启动三省六部制执行流程：$ARGUMENTS",
+      "agent": "huangdi"
+    },
+    "cr-start": {
+      "description": "启动 CR 变更请求处理流程（需指定 asset_type/asset_name/变更描述）",
+      "template": "切换到 cr-processing 域，设置变量，然后启动 CR 流程：$ARGUMENTS",
+      "agent": "huangdi"
+    }
+  },
+
+  "permission": {
+    "skill": { "*": "allow" }
+  },
+
+  "plugin": [
+    ".opencode/plugins/sansheng-liubu.ts"
+  ]
+}

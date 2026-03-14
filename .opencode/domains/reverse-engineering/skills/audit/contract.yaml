@@ -1,0 +1,24 @@
+slot: hubu
+name: 户部
+description: 全局审计，最终交付验收
+
+inputs:
+  - name: module_name
+    type: string
+    required: true
+
+outputs:
+  - name: audit_report
+    pattern: "specs/final-audit-report.md"
+
+verify:
+  - type: file_exists
+    path: "specs/final-audit-report.md"
+    error_msg: "户部验收失败：审计报告未生成"
+  - type: command
+    run: "ionic build --prod 2>&1"
+    expect: exit_code_0
+    error_msg: "户部验收失败：生产构建失败"
+
+depends_on: [libu, xingbu, libu2, bingbu, gongbu]
+retry_max: 1

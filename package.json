@@ -1,0 +1,45 @@
+{
+  "name": "@deep-flux/liubu",
+  "version": "1.0.0-beta.1",
+  "description": "三省六部制 OpenCode Plugin - 完整的多智能体协作框架，包含皇帝（战略决策）、三省（规划审核执行）、六部（具体实现）的分层架构",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "keywords": [
+    "opencode",
+    "plugin",
+    "multi-agent",
+    "workflow",
+    "三省六部制",
+    "hierarchical-governance",
+    "ai-orchestration"
+  ],
+  "author": "Sansheng Liubu Contributors",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/sansheng-liubu"
+  },
+  "files": [
+    "dist",
+    ".opencode",
+    "package.json",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "prepublishOnly": "npm run build",
+    "clean": "rm -rf dist"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "peerDependencies": {
+    "@opencode-ai/sdk": "^1.2.0"
+  },
+  "devDependencies": {
+    "@opencode-ai/sdk": "^1.2.24",
+    "@types/node": "^20.19.37",
+    "typescript": "^5.9.3"
+  }
+}

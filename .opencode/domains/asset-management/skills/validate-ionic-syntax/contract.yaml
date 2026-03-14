@@ -1,0 +1,78 @@
+---
+slot: validate-ionic-syntax
+name: Ionic 代码校验
+description: 校验生成的 Ionic 代码是否符合语法和规范
+retry_max: 1
+depends_on:
+  - generate-infrastructure
+
+verify:
+  # 检查 1：校验报告文件是否生成
+  - type: file_exists
+    path: "validation-report.json"
+    error_msg: "校验报告文件缺失（应生成 validation-report.json）"
+
+  # 检查 2：校验报告中的 status 是否为 PASS
+  - type: command
+    run: "jq -r '.status' validation-report.json"
+    expect: contains
+    value: "PASS"
+    error_msg: "Ionic 代码校验失败，请查看 validation-report.json 中的错误清单"
+
+  # 检查 3：是否有严重错误（errors 数组为空）
+  - type: command
+    run: "jq '.errors | length' validation-report.json"
+    expect: contains
+    value: "0"
+    error_msg: "存在代码校验错误，需要修复"
+
+  # 检查 4：Component 文件是否存在
+  - type: file_exists
+    path: "src/app/components"
+    error_msg: "组件目录缺失"
+
+  # 检查 5：Service 文件是否存在
+  - type: file_exists
+    path: "src/app/services"
+    error_msg: "服务目录缺失"
+
+  # 检查 6：验证生成的 .ts 文件数量
+  - type: command
+    run: "find src -name '*.ts' | wc -l"
+    expect: contains
+    value: "."  # 只要有输出就行（表示找到了文件）
+    error_msg: "未找到生成的 TypeScript 文件"
+
+  # 检查 7：验证生成的 .html 模板数量
+  - type: command
+    run: "find src -name '*.html' | wc -l"
+    expect: contains
+    value: "."  # 只要有输出就行
+    error_msg: "未找到生成的模板文件"
+
+---
+
+## 验收规则说明
+
+### 关键检查项
+
+| 检查项 | 类型 | 说明 |
+|--------|------|------|
+| validation-report.json | 文件存在 | 校验工具必须生成报告文件 |
+| status = PASS | JSON 值 | 报告中的 status 字段必须是 PASS |
+| errors 为空 | JSON 数组 | 不允许有严重错误 |
+| src/app/components | 目录 | 必须生成组件目录 |
+| src/app/services | 目录 | 必须生成服务目录 |
+| *.ts 文件存在 | 文件计数 | 必须生成 TypeScript 文件 |
+| *.html 文件存在 | 文件计数 | 必须生成模板文件 |
+
+### 通过条件
+
+✅ **所有 7 个检查项都通过**，验收才算成功
+
+### 失败处理
+
+❌ **任何一个检查失败**：
+1. 停止流程
+2. 显示失败原因
+3. 返回给工部重新生成代码或修复错误

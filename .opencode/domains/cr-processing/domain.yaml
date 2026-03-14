@@ -1,0 +1,43 @@
+name: cr-processing
+description: 变更请求处理，修改现有 OpenSpec 资产并维护版本历史
+version: 1.0.0
+
+constraints:
+  - "必须先确认 openspec/{asset_type}/{asset_name}/ 目录存在，否则拒绝 CR"
+  - "版本号必须递增：Major.Minor 格式，Breaking Change 升 Major，其他升 Minor"
+  - "proposal.md 永远不可修改（历史记录）"
+  - "所有代码变更必须通过现有测试才能持久化"
+  - "changelog.md 必须记录变更类型（Breaking/Compatible/Enhancement）"
+
+pipeline:
+  - id: cr-proposal
+    name: CR 提议与分析
+    description: 分析变更需求，查找现有资产，评估影响范围和兼容性
+    skill: cr-proposal
+    uses: [yibu, hubu]
+  - id: cr-specification
+    name: CR 规格设计
+    description: 更新 specification.md，定义新版本规格和验收标准
+    skill: cr-specification
+    uses: [libu, xingbu]
+  - id: cr-implementation
+    name: CR 实现
+    description: 修改代码，运行测试，验证向后兼容性
+    skill: cr-implementation
+    uses: [gongbu, bingbu, xingbu]
+  - id: cr-persist
+    name: CR 版本归档
+    description: 创建新版本 archive，更新 changelog，持久化完整变更历史
+    skill: cr-persist
+    uses: [kubu]
+
+variables:
+  - name: asset_type
+    description: 资产类型，如 service / data-model / ui-component
+    required: true
+  - name: asset_name
+    description: 资产名称，如 user-service
+    required: true
+  - name: cr_description
+    description: 变更需求描述
+    required: true

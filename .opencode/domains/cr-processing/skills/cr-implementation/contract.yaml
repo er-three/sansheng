@@ -1,0 +1,17 @@
+slot: cr-implementation
+name: CR 实现验收
+verify:
+  - type: command
+    run: find openspec/{asset_type}/{asset_name}/implementation -type f -name "*.ts" -o -name "*.js" -o -name "*.py" 2>/dev/null | head -1
+    expect: exit_code_0
+    error_msg: 必须在 implementation/code 目录下有代码文件
+  - type: command
+    run: test -f test-results.json || npm test 2>&1 | grep -q "pass\|OK\|success"
+    expect: exit_code_0
+    error_msg: 所有测试必须通过
+  - type: command
+    run: grep -q "breaking_change: true" specification.md && test -f migration-guide.md || echo "no breaking change"
+    expect: exit_code_0
+    error_msg: Breaking Change 时必须提供 migration-guide.md
+retry_max: 3
+depends_on: [cr-specification]

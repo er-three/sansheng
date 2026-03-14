@@ -1,0 +1,37 @@
+slot: verify-consistency
+name: 户部
+description: 跨资产一致性核验，六条引用链全部闭合
+
+inputs:
+  - name: module_name
+    type: string
+    required: true
+
+outputs:
+  - name: consistency_report
+    path: "openspec/specs/{module_name}/consistency-report.md"
+
+verify:
+  - type: file_exists
+    path: "openspec/specs/{module_name}/consistency-report.md"
+    error_msg: "一致性核验报告未生成"
+  - type: file_exists
+    path: "openspec/specs/{module_name}/{module_name}.ui.yaml"
+    error_msg: "ui.yaml 不存在，无法完成一致性核验"
+  - type: file_exists
+    path: "openspec/specs/{module_name}/{module_name}.logic.ts"
+    error_msg: "logic.ts 不存在，无法完成一致性核验"
+  - type: file_exists
+    path: "openspec/specs/{module_name}/{module_name}.ui.mapping.yaml"
+    error_msg: "ui.mapping.yaml 不存在，无法完成一致性核验"
+  - type: file_exists
+    path: "openspec/specs/{module_name}/{module_name}.behavior.md"
+    error_msg: "behavior.md 不存在，无法完成一致性核验"
+  - type: command
+    run: "grep -c 'PASS\\|通过\\|闭合' openspec/specs/{module_name}/consistency-report.md || echo 0"
+    expect: contains
+    value: "1"
+    error_msg: "一致性核验报告显示存在断链，请定位问题资产后重新提取"
+
+depends_on: [scan, extract, mapping, behavior, detect]
+retry_max: 1

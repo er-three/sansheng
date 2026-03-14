@@ -1,0 +1,33 @@
+slot: xingbu
+name: 刑部
+description: 建立测试防护网，TDD Red Phase
+
+inputs:
+  - name: module_name
+    type: string
+    required: true
+  - name: page_name
+    type: string
+    required: true
+
+outputs:
+  - name: mock_files
+    pattern: "src/app/mocks/*.mock.ts"
+  - name: spec_file
+    pattern: "src/app/pages/{page_name}/{page_name}.page.spec.ts"
+  - name: stub_file
+    pattern: "src/app/pages/{page_name}/{page_name}.page.ts"
+
+verify:
+  - type: command
+    run: "npm test -- --no-coverage 2>&1"
+    expect: contains
+    value: "FAILED"
+    error_msg: "刑部验收失败：期望测试失败（Red状态），但测试通过了"
+  - type: command
+    run: "npx tsc --noEmit"
+    expect: exit_code_0
+    error_msg: "刑部验收失败：编译报错"
+
+depends_on: [libu]
+retry_max: 2

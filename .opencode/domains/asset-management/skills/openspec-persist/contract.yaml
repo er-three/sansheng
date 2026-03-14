@@ -1,0 +1,24 @@
+slot: openspec-persist
+name: OpenSpec 规范化和持久化
+verify:
+  - type: file_exists
+    path: openspec/
+    error_msg: "openspec 根目录未创建"
+  - type: command
+    run: "find openspec -name 'proposal.md' | wc -l | grep -qv '^0$'"
+    expect: exit_code_0
+    error_msg: "未生成任何 proposal.md"
+  - type: command
+    run: "find openspec -name 'specification.md' | wc -l | grep -qv '^0$'"
+    expect: exit_code_0
+    error_msg: "未生成任何 specification.md"
+  - type: command
+    run: "find openspec -name 'changelog.md' | wc -l | grep -qv '^0$'"
+    expect: exit_code_0
+    error_msg: "未生成任何 changelog.md"
+  - type: command
+    run: "find openspec -type d -name 'archive' | wc -l | grep -qv '^0$'"
+    expect: exit_code_0
+    error_msg: "未创建 archive 目录"
+retry_max: 1
+depends_on: [verify-consistency]

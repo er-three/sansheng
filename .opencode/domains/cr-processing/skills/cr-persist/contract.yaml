@@ -1,0 +1,17 @@
+slot: cr-persist
+name: CR 版本归档验收
+verify:
+  - type: command
+    run: test -d "openspec/{asset_type}/{asset_name}/archive" && ls openspec/{asset_type}/{asset_name}/archive/ | grep -q "^v[0-9]"
+    expect: exit_code_0
+    error_msg: archive 目录必须包含版本号目录（v1.0 等）
+  - type: command
+    run: grep -q "^## v" openspec/{asset_type}/{asset_name}/changelog.md
+    expect: exit_code_0
+    error_msg: changelog.md 必须包含版本记录（## v{version}）
+  - type: command
+    run: openspec_validate --asset-type={asset_type} --asset-name={asset_name}
+    expect: exit_code_0
+    error_msg: openspec_validate 验证必须通过
+retry_max: 3
+depends_on: [cr-implementation]

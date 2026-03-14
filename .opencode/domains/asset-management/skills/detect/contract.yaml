@@ -1,0 +1,25 @@
+slot: detect
+name: 工部
+description: 框架代码全局检测，确保零框架污染
+
+inputs:
+  - name: module_name
+    type: string
+    required: true
+
+outputs:
+  - name: detection_result
+    description: 所有资产文件通过框架代码检测
+
+verify:
+  - type: command
+    run: "bash scripts/detect-framework-code.sh openspec/specs/{module_name}/{module_name}.ui.yaml"
+    expect: exit_code_0
+    error_msg: "ui.yaml 框架代码检测失败，存在框架污染，需回退兵部重新提取 extract-ui"
+  - type: command
+    run: "bash scripts/detect-framework-code.sh openspec/specs/{module_name}/{module_name}.logic.ts"
+    expect: exit_code_0
+    error_msg: "logic.ts 框架代码检测失败，存在框架污染，需回退兵部重新提取 extract-logic"
+
+depends_on: [scan, extract, mapping, behavior]
+retry_max: 1

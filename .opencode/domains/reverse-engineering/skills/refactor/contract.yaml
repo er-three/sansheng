@@ -1,0 +1,30 @@
+slot: gongbu
+name: 工部
+description: 重构优化，代码质量保障
+
+inputs:
+  - name: page_name
+    type: string
+    required: true
+
+outputs:
+  - name: page_file
+    pattern: "src/app/pages/{page_name}/{page_name}.page.ts"
+
+verify:
+  - type: command
+    run: "npm run lint"
+    expect: exit_code_0
+    error_msg: "工部验收失败：lint 未通过"
+  - type: command
+    run: "ionic build --prod 2>&1"
+    expect: exit_code_0
+    error_msg: "工部验收失败：生产构建失败"
+  - type: command
+    run: "npm test -- --no-coverage 2>&1"
+    expect: contains
+    value: "PASSED"
+    error_msg: "工部验收失败：重构后测试不通过"
+
+depends_on: [libu, xingbu, libu2, bingbu]
+retry_max: 2

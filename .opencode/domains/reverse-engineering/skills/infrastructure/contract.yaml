@@ -1,0 +1,25 @@
+slot: libu
+name: 吏部
+description: 基础设施搭建，生成 Service、Provider 和数据模型
+
+# 代码验收用（Harness 读取）
+inputs:
+  - name: module_name
+    type: string
+    required: true
+
+outputs:
+  - name: service_files
+    pattern: "src/app/**/*.service.ts"
+  - name: provider_files
+    pattern: "src/app/**/*.provider.ts"
+
+# Harness 执行的验收命令
+verify:
+  - type: command
+    run: "npx tsc --noEmit"
+    expect: exit_code_0
+    error_msg: "编译失败，吏部验收不通过"
+
+depends_on: []
+retry_max: 2

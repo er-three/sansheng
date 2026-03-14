@@ -1,0 +1,61 @@
+name: reverse-engineering
+description: Ionic 8 反向工程迁移，TDD 全流程
+version: 1.0.0
+
+# 初始化时自动加载的 Skill（Plugin 在 chat.system.transform 里注入其内容）
+# 这些 Skill 的内容会在每次对话开始时自动出现在 AI 的上下文里
+init_skills:
+  - project-standards   # 包含完整的 Section 2A Path Resolution Table
+
+# 全局约束（基于 project-standards 的内容精炼，Plugin 自动注入）
+constraints:
+  - "创建任何文件前必须查阅 Section 2A Path Resolution Table，不允许自行推断路径"
+  - "类名 → 文件路径转换：去掉类型后缀 → PascalCase 转 kebab-case → 拼接目录+后缀"
+  - "Provider 类型统一归到 src/app/services/ 目录，不单独建 providers 目录"
+  - "TranslateService / AlertController / Router 等外部库直接 import，不创建本地文件"
+  - "优先使用 awesome-ionic-mcp 的 ionic_generate，失败才降级 CLI，两者失败立即终止"
+  - "禁止手动创建文件（必须通过 ionic_generate 或 CLI）"
+  - "所有组件使用 standalone: true，禁止使用 NgModule"
+  - "变更检测统一使用 ChangeDetectionStrategy.OnPush"
+
+# 执行顺序（Harness 代码强制，AI 不可跳步）
+pipeline:
+  - id: infrastructure
+    name: 基础设施搭建
+    description: 生成 Service、Provider 和数据模型
+    skill: infrastructure
+    uses: [yibu, gongbu]
+  - id: tdd-red
+    name: 测试防护网（TDD Red Phase）
+    description: 编写测试用例，建立防护网
+    skill: tdd-red
+    uses: [xingbu, gongbu]
+  - id: ui-generation
+    name: UI 生成
+    description: 生成 UI 组件与模板
+    skill: ui-generation
+    uses: [yibu, gongbu]
+  - id: tdd-green
+    name: 逻辑注入（TDD Green Phase）
+    description: 实现业务逻辑通过测试
+    skill: tdd-green
+    uses: [bingbu, gongbu]
+  - id: refactor
+    name: 重构优化
+    description: 优化代码质量与性能
+    skill: refactor
+    uses: [xingbu, gongbu]
+  - id: audit
+    name: 全局审计交付
+    description: 全面审查与交付验收
+    skill: audit
+    uses: [yibu, xingbu, hubu]
+
+# 任务所需变量
+variables:
+  - name: module_name
+    description: 模块名称，如 asset-manager
+    required: true
+  - name: page_name
+    description: 页面名称，如 asset-manager
+    required: true

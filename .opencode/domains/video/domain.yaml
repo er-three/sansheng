@@ -1,0 +1,33 @@
+name: video
+description: AI 视频自动生成，Pexels素材 + TTS配音 + CapCut组装
+version: 1.0.0
+
+constraints:
+  - "视频文件必须放在 ~/Movies/CapCutMedia/ 目录，禁止使用 Desktop 路径"
+  - "每段视频时长由 TTS 实际时长决定，不使用固定时长"
+  - "素材下载失败时使用纯色背景兜底，不中断流程"
+
+pipeline:
+  - id: download-materials
+    name: 搜索并下载素材
+    description: 搜索并下载 Pexels 视频素材
+    skill: download-materials
+    uses: [bingbu]
+  - id: generate-tts
+    name: 生成 TTS 配音
+    description: 生成 TTS 配音
+    skill: generate-tts
+    uses: [libu]
+  - id: assemble-capcut
+    name: 组装 CapCut 项目
+    description: 组装 CapCut 项目
+    skill: assemble-capcut
+    uses: [gongbu]
+
+variables:
+  - name: topic
+    description: 视频主题，如 宇宙的奥秘
+    required: true
+  - name: project_name
+    description: CapCut 项目名称
+    required: true

@@ -1,0 +1,8 @@
+{
+  "version": "2.0",
+  "active_domain": "reverse-engineering",
+  "variables": {
+    "module_name": "",
+    "page_name": ""
+  }
+}

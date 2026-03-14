@@ -1,0 +1,30 @@
+slot: mapping
+name: 礼部
+description: UI 框架映射，验证无框架污染且映射条目充足
+
+inputs:
+  - name: module_name
+    type: string
+    required: true
+
+outputs:
+  - name: ui_mapping
+    path: "openspec/specs/{module_name}/{module_name}.ui.mapping.yaml"
+
+verify:
+  - type: file_exists
+    path: "openspec/specs/{module_name}/{module_name}.ui.mapping.yaml"
+    error_msg: "ui.mapping.yaml 不存在"
+  - type: command
+    run: "grep -cE 'ion-|ng-|v-' openspec/specs/{module_name}/{module_name}.ui.yaml || echo 0"
+    expect: contains
+    value: "0"
+    error_msg: "ui.yaml 中存在框架标签（ion-/ng-/v-），礼部验收不通过，需回退 extract-ui 重新提取"
+  - type: command
+    run: "grep -c 'abstract:' openspec/specs/{module_name}/{module_name}.ui.mapping.yaml"
+    expect: contains
+    value: "1"
+    error_msg: "ui.mapping.yaml 中 abstract 条目不足，映射覆盖率不够"
+
+depends_on: [scan, extract]
+retry_max: 2

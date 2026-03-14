@@ -1,0 +1,59 @@
+name: asset-management
+description: 从旧代码提取五份资产，强制并行提取 + bash 独立验证，确保零遗漏零幻觉
+version: 1.0.0
+
+init_skills:
+  - asset-standards
+
+# 全局约束（Plugin 自动注入，无需在每次 task 调用里重复传入）
+constraints:
+  - "禁止压缩内容，必须完整输出每一行"
+  - "禁止模糊词：等、…、相关逻辑、类似逻辑、省略"
+  - "所有内容必须行号绑定（line: xxx）"
+  - "禁止框架代码混入（ion-、ng-、v- 等前缀）"
+  - "生成内容必须立即落盘，返回文件路径后结束，禁止只展示在对话框"
+  - "遇到错误只重试一次，失败则报错退出，禁止跳过"
+
+# 执行顺序（Harness 代码强制，AI 不可跳步）
+pipeline:
+  - id: scan
+    name: 代码扫描
+    description: 代码扫描，生成 code-index.yaml 作为后续所有提取的数据源
+    skill: scan
+    uses: [yibu]
+  - id: extract
+    name: 并行资产提取
+    description: 并行资产提取（5个 Subagent 同时启动）
+    skill: extract
+    uses: [bingbu, gongbu]
+  - id: mapping
+    name: UI 框架映射
+    description: UI 框架映射，生成 ui.mapping.yaml
+    skill: mapping
+    uses: [yibu, gongbu]
+  - id: behavior
+    name: 行为场景提取
+    description: 行为场景提取，生成 behavior.md
+    skill: behavior
+    uses: [yibu, gongbu]
+  - id: detect
+    name: 框架代码全局检测
+    description: 框架代码全局检测，确保无框架污染
+    skill: detect
+    uses: [yibu, xingbu]
+  - id: verify-consistency
+    name: 跨资产一致性核验
+    description: 跨资产一致性核验，六条引用链全部闭合
+    skill: verify-consistency
+    uses: [yibu, xingbu]
+  - id: persist-with-openspec
+    name: OpenSpec 规范化和持久化
+    description: 将所有资产按 OpenSpec 规范进行持久化，生成可追溯的资产档案
+    skill: openspec-persist
+    uses: [kubu]
+
+# 任务所需变量
+variables:
+  - name: module_name
+    description: 模块名称，如 asset-manager
+    required: true

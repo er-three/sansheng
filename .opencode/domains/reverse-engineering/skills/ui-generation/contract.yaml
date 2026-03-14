@@ -1,0 +1,26 @@
+slot: libu2
+name: 礼部
+description: UI 生成，Ionic 8 页面模板和样式
+
+inputs:
+  - name: module_name
+    type: string
+    required: true
+  - name: page_name
+    type: string
+    required: true
+
+outputs:
+  - name: html_file
+    pattern: "src/app/pages/{page_name}/{page_name}.page.html"
+  - name: scss_file
+    pattern: "src/app/pages/{page_name}/{page_name}.page.scss"
+
+verify:
+  - type: command
+    run: "npx tsc --noEmit"
+    expect: exit_code_0
+    error_msg: "礼部验收失败：模板编译报错"
+
+depends_on: [libu, xingbu]
+retry_max: 2

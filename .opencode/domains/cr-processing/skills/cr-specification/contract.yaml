@@ -1,0 +1,19 @@
+slot: cr-specification
+name: CR 规格设计验收
+verify:
+  - type: file_exists
+    path: specification.md
+    error_msg: 缺失 specification.md
+  - type: command
+    run: grep -q "version:" specification.md
+    expect: exit_code_0
+    error_msg: specification.md 必须包含 version 字段
+  - type: command
+    run: grep -q "breaking_change:" specification.md
+    expect: exit_code_0
+    error_msg: specification.md 必须包含 breaking_change 字段
+  - type: file_exists
+    path: cr-specification-diff.md
+    error_msg: 缺失 cr-specification-diff.md
+retry_max: 3
+depends_on: [cr-proposal]

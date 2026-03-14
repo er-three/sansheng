@@ -1,0 +1,25 @@
+slot: bingbu
+name: 兵部
+description: 业务逻辑注入，TDD Green Phase
+
+inputs:
+  - name: module_name
+    type: string
+    required: true
+  - name: page_name
+    type: string
+    required: true
+
+outputs:
+  - name: page_file
+    pattern: "src/app/pages/{page_name}/{page_name}.page.ts"
+
+verify:
+  - type: command
+    run: "npm test -- --no-coverage 2>&1"
+    expect: contains
+    value: "PASSED"
+    error_msg: "兵部验收失败：测试未全部通过（Green状态未达成）"
+
+depends_on: [libu, xingbu, libu2]
+retry_max: 3

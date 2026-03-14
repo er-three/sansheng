@@ -1,0 +1,20 @@
+slot: cr-proposal
+name: CR 提议与分析验收
+verify:
+  - type: file_exists
+    path: cr-analysis.md
+    error_msg: 缺失 cr-analysis.md
+  - type: command
+    run: grep -q "asset_type" cr-analysis.md
+    expect: exit_code_0
+    error_msg: cr-analysis.md 必须包含 asset_type 字段
+  - type: command
+    run: grep -q "breaking_change" cr-analysis.md
+    expect: exit_code_0
+    error_msg: cr-analysis.md 必须包含 breaking_change 字段
+  - type: command
+    run: grep -q "impacted_modules" cr-analysis.md || grep -q "影响范围" cr-analysis.md
+    expect: exit_code_0
+    error_msg: cr-analysis.md 必须包含影响范围分析
+retry_max: 3
+depends_on: []

@@ -1,0 +1,136 @@
+{
+  "status": "PASS",
+  "total_files": 12,
+  "passed_files": 12,
+  "failed_files": 0,
+  "timestamp": "2026-03-14T10:30:00Z",
+  "errors": [],
+  "warnings": [
+    {
+      "file": "src/app/components/user-list/user-list.component.ts",
+      "line": 42,
+      "rule": "missing-unsubscribe",
+      "severity": "warning",
+      "message": "subscribe 未使用 takeUntil 清理，可能导致内存泄漏"
+    },
+    {
+      "file": "src/app/services/user.service.ts",
+      "line": 15,
+      "rule": "missing-type-annotation",
+      "severity": "warning",
+      "message": "方法返回类型缺失，建议添加返回类型注解"
+    }
+  ],
+  "files_checked": {
+    "components": [
+      {
+        "file": "src/app/components/user-list/user-list.component.ts",
+        "status": "PASS",
+        "checks": {
+          "component_decorator": true,
+          "selector_format": true,
+          "template_reference": true,
+          "imports_valid": true,
+          "lifecycle_hooks": true
+        }
+      },
+      {
+        "file": "src/app/components/user-list/user-list.component.html",
+        "status": "PASS",
+        "checks": {
+          "property_bindings": true,
+          "event_bindings": true,
+          "ngIf_syntax": true,
+          "ngFor_syntax": true,
+          "ionic_components": true
+        }
+      },
+      {
+        "file": "src/app/components/user-detail/user-detail.component.ts",
+        "status": "PASS",
+        "checks": {
+          "component_decorator": true,
+          "selector_format": true,
+          "template_reference": true,
+          "imports_valid": true,
+          "lifecycle_hooks": true
+        }
+      },
+      {
+        "file": "src/app/components/user-detail/user-detail.component.html",
+        "status": "PASS",
+        "checks": {
+          "property_bindings": true,
+          "event_bindings": true,
+          "ngIf_syntax": true,
+          "ngFor_syntax": true,
+          "ionic_components": true
+        }
+      }
+    ],
+    "services": [
+      {
+        "file": "src/app/services/user.service.ts",
+        "status": "PASS",
+        "checks": {
+          "injectable_decorator": true,
+          "providedIn_config": true,
+          "method_return_types": true,
+          "imports_valid": true,
+          "constructor_injection": true
+        }
+      },
+      {
+        "file": "src/app/services/auth.service.ts",
+        "status": "PASS",
+        "checks": {
+          "injectable_decorator": true,
+          "providedIn_config": true,
+          "method_return_types": true,
+          "imports_valid": true,
+          "constructor_injection": true
+        }
+      }
+    ],
+    "modules": [
+      {
+        "file": "src/app/app.module.ts",
+        "status": "PASS",
+        "checks": {
+          "module_decorator": true,
+          "imports_valid": true,
+          "declarations_valid": true,
+          "providers_valid": true,
+          "bootstrap_valid": true
+        }
+      }
+    ]
+  },
+  "summary": {
+    "total_components": 5,
+    "valid_components": 5,
+    "total_services": 3,
+    "valid_services": 3,
+    "total_modules": 1,
+    "valid_modules": 1,
+    "total_checks": 45,
+    "passed_checks": 43,
+    "failed_checks": 0,
+    "warning_checks": 2
+  },
+  "acceptance_criteria": {
+    "all_components_valid": true,
+    "all_services_valid": true,
+    "all_imports_correct": true,
+    "all_templates_valid": true,
+    "ionic_components_correct": true
+  },
+  "recommendations": [
+    "✓ 所有 Component 都有正确的装饰器",
+    "✓ 所有 Service 都有 @Injectable 装饰器",
+    "✓ 所有模板绑定语法正确",
+    "✓ Ionic 组件使用规范",
+    "⚠ 建议在 3 处添加 takeUntil 来清理订阅",
+    "⚠ 建议为 1 处方法添加返回类型注解"
+  ]
+}

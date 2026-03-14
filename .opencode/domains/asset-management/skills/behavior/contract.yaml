@@ -1,0 +1,25 @@
+slot: behavior
+name: 刑部
+description: 行为场景提取，验证文件存在且有足够的场景覆盖
+
+inputs:
+  - name: module_name
+    type: string
+    required: true
+
+outputs:
+  - name: behavior_md
+    path: "openspec/specs/{module_name}/{module_name}.behavior.md"
+
+verify:
+  - type: file_exists
+    path: "openspec/specs/{module_name}/{module_name}.behavior.md"
+    error_msg: "behavior.md 不存在，行为场景提取失败"
+  - type: command
+    run: "grep -c 'logic_ref' openspec/specs/{module_name}/{module_name}.behavior.md"
+    expect: contains
+    value: "1"
+    error_msg: "behavior.md 中缺少 logic_ref 绑定，场景未与 logic.ts 关联"
+
+depends_on: [scan, extract]
+retry_max: 2
