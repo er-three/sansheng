@@ -13,21 +13,31 @@
  * 2. AST 语义分析 - 代码结构感知
  * 3. OpenSpec 规范系统 - 版本化资产管理
  * 4. CR 变更请求处理 - 完整的变更流程
- * 5. 并行执行协议 - 步骤间串行、步骤内并行
+ * 5. 并行执行协议 - Level 1 步骤串行、Level 2 代理并行、Level 3 子任务并行
+ * 6. 全局约束注入 - 自动注入到所有 Agent system prompt
  */
 
-// 默认导出：Plugin 初始化函数（可选）
-export default function registerSanshengLiubuPlugin(api?: any): void {
+import { sanshengLiubuPlugin } from "./plugin"
+
+// 默认导出：完整的执行层 Plugin
+export default sanshengLiubuPlugin
+
+/**
+ * Plugin 初始化函数（向后兼容）
+ */
+export function registerSanshengLiubuPlugin(api?: any): void {
   if (api?.log) {
-    api.log.info("[三省六部制] OpenCode Plugin 已加载");
-    api.log.info("可用命令: /switch-domain, /status, /start, /cr-start");
+    api.log.info("[三省六部制] OpenCode Plugin 已加载（含完整执行层）");
+    api.log.info("可用工具: init_parallel, pipeline_status, set_variables, switch_domain, list_domains");
+    api.log.info("支持: Level 2 代理并行、全局约束注入、并行状态跟踪");
   }
 }
 
-// 导出类型和工具函数供外部使用
-export const PLUGIN_NAME = "@sansheng/liubu";
-export const PLUGIN_VERSION = "1.0.0";
-export const PLUGIN_DESCRIPTION = "三省六部制 OpenCode Plugin - 分层多智能体协作框架";
+// 导出类型和配置函数供外部使用
+export const PLUGIN_NAME = "@sansheng/liubu"
+export const PLUGIN_VERSION = "1.0.0"
+export const PLUGIN_DESCRIPTION =
+  "三省六部制 OpenCode Plugin - 分层多智能体协作框架（含 Level 2/3 并行 + 全局约束注入）"
 
 /**
  * 获取 plugin 信息
