@@ -56,16 +56,52 @@ interface Registry {
   pipeline_state?: PipelineState
 }
 
+interface VerificationCriterion {
+  type: "file_exists" | "file_not_empty" | "file_size_min" | "no_error_keywords" | "timeout" | "agent_all_done" | "custom"
+  path?: string
+  bytes?: number
+  keywords?: string[]
+  max_seconds?: number
+  count?: number
+  condition?: string
+  error_msg?: string
+}
+
+interface StepConfig {
+  id: string
+  name: string
+  skill: string
+  uses: string[]
+  depends_on?: string[]
+  success_criteria?: VerificationCriterion[]
+  failure_criteria?: VerificationCriterion[]
+  retry_max?: number
+  on_success?: "continue" | "halt"
+  on_failure?: "retry" | "halt" | "skip"
+}
+
 interface DomainConfig {
   name: string
   description: string
   constraints: string[]
-  pipeline: Array<{
-    id: string
-    name: string
-    skill: string
-    uses: string[]
-  }>
+  pipeline: StepConfig[]
+}
+
+interface StepResult {
+  step_id: string
+  step_name: string
+  status: "success" | "failed" | "partial"
+  passed_criteria: string[]
+  failed_criteria: string[]
+  details: Record<string, unknown>
+  timestamp: number
+}
+
+interface PipelineStepStatus {
+  step_id: string
+  status: "pending" | "in_progress" | "success" | "failed" | "partial"
+  result?: StepResult
+  retry_count: number
 }
 
 interface GlobalConstraints {
@@ -153,6 +189,108 @@ function readGlobalConstraints(root: string): GlobalConstraints | null {
 }
 
 /**
+ * 验证步骤成功/失败
+ */
+function verifyStepCriteria(
+  stepConfig: StepConfig,
+  projectRoot: string
+): StepResult {
+  const passedCriteria: string[] = []
+  const failedCriteria: string[] = []
+  const details: Record<string, unknown> = {}
+
+  // 检查成功条件
+  if (stepConfig.success_criteria && stepConfig.success_criteria.length > 0) {
+    for (const criterion of stepConfig.success_criteria) {
+      try {
+        let passed = false
+        const message = criterion.error_msg || `Criterion: ${criterion.type}`
+
+        if (criterion.type === "file_exists") {
+          const filePath = path.join(projectRoot, criterion.path || "")
+          passed = fs.existsSync(filePath)
+          if (passed) {
+            passedCriteria.push(`✅ 文件存在: ${criterion.path}`)
+          } else {
+            failedCriteria.push(`❌ 文件缺失: ${criterion.path}`)
+          }
+        } else if (criterion.type === "file_not_empty") {
+          const filePath = path.join(projectRoot, criterion.path || "")
+          if (fs.existsSync(filePath)) {
+            const size = fs.statSync(filePath).size
+            passed = size > 0
+            if (passed) {
+              passedCriteria.push(`✅ 文件非空: ${criterion.path} (${size} bytes)`)
+            } else {
+              failedCriteria.push(`❌ 文件为空: ${criterion.path}`)
+            }
+          } else {
+            failedCriteria.push(`❌ 文件缺失: ${criterion.path}`)
+          }
+        } else if (criterion.type === "file_size_min") {
+          const filePath = path.join(projectRoot, criterion.path || "")
+          if (fs.existsSync(filePath)) {
+            const size = fs.statSync(filePath).size
+            passed = size >= (criterion.bytes || 0)
+            if (passed) {
+              passedCriteria.push(
+                `✅ 文件大小满足: ${criterion.path} (${size} >= ${criterion.bytes} bytes)`
+              )
+            } else {
+              failedCriteria.push(
+                `❌ 文件过小: ${criterion.path} (${size} < ${criterion.bytes} bytes)`
+              )
+            }
+          } else {
+            failedCriteria.push(`❌ 文件缺失: ${criterion.path}`)
+          }
+        } else if (criterion.type === "no_error_keywords") {
+          const filePath = path.join(projectRoot, criterion.path || "")
+          if (fs.existsSync(filePath)) {
+            const content = fs.readFileSync(filePath, "utf-8")
+            const keywords = criterion.keywords || ["ERROR", "FAILED"]
+            const hasErrors = keywords.some((k) => content.includes(k))
+            passed = !hasErrors
+            if (passed) {
+              passedCriteria.push(`✅ 无错误关键字: ${criterion.path}`)
+            } else {
+              failedCriteria.push(
+                `❌ 发现错误关键字: ${criterion.path} 包含 ${keywords.join(", ")}`
+              )
+            }
+          }
+        } else if (criterion.type === "agent_all_done") {
+          passed = true // 由 Level 2 管理
+          passedCriteria.push(`✅ 所有代理执行完成`)
+        }
+
+        details[criterion.type] = { passed, criterion }
+      } catch (error) {
+        failedCriteria.push(`❌ 验证异常: ${criterion.type} - ${String(error)}`)
+        details[criterion.type] = { error: String(error) }
+      }
+    }
+  }
+
+  const status =
+    failedCriteria.length === 0
+      ? "success"
+      : passedCriteria.length > 0
+        ? "partial"
+        : "failed"
+
+  return {
+    step_id: stepConfig.id,
+    step_name: stepConfig.name,
+    status,
+    passed_criteria: passedCriteria,
+    failed_criteria: failedCriteria,
+    details,
+    timestamp: Date.now(),
+  }
+}
+
+/**
  * 生成流水线状态显示
  */
 function generatePipelineStatus(
@@ -182,7 +320,7 @@ function generatePipelineStatus(
   lines.push(`[${bar}] ${Math.round((done / total) * 100)}%`)
   lines.push("")
 
-  // 步骤详情
+  // 步骤详情（显示成功/失败状态）
   for (let i = 0; i < domain.pipeline.length; i++) {
     const step = domain.pipeline[i]
     const isDone = completed.includes(step.id)
@@ -190,16 +328,26 @@ function generatePipelineStatus(
     const isParallel = parallelExec?.step_id === step.id
 
     let icon = "⬜"
-    if (isDone) icon = "✅"
-    else if (isActive || isParallel) icon = "▶️"
+    let statusSuffix = ""
+
+    if (isDone) {
+      icon = "✅"
+    } else if (isActive || isParallel) {
+      icon = "▶️"
+    }
 
     const uses = step.uses.join(", ")
-    const status = isParallel
+    const levelStatus = isParallel
       ? `[${parallelExec.tasks.map((t) => `${t.agent}=${t.status[0]}`).join(",")}]`
       : ""
 
-    lines.push(`${icon} ${i + 1}. ${step.name} (${step.id})`)
-    if (uses) lines.push(`   用: ${uses} ${status}`)
+    lines.push(`${icon} ${i + 1}. ${step.name} (${step.id})${statusSuffix}`)
+    if (uses) lines.push(`   用: ${uses} ${levelStatus}`)
+
+    // 显示成功条件数量（如果有定义）
+    if (step.success_criteria && step.success_criteria.length > 0) {
+      lines.push(`   验证: ${step.success_criteria.length} 个成功条件`)
+    }
   }
 
   lines.push("═".repeat(60))
