@@ -45,22 +45,21 @@ npm install @deep-flux/liubu
 
 ## 工作流程
 
-### 标准流程（7 步）
+### 标准流程（6 步）
 
 ```
 【第 1 步 - 用户输入】
 /start 任务描述
    ↓
-【第 2-4 步 - 用户选择（手动）】
-1️⃣ 皇帝确认意图（自动理解）
-2️⃣ 设置变量（手动：set_variables）
-3️⃣ 选择工作域（手动：/switch-domain）
+【第 2 步 - 用户设置（手动）】
+1️⃣ 设置变量（手动：set_variables）
    ↓
-【第 5-7 步 - 自动执行】
-4️⃣ 中书省制定计划（自动）
-5️⃣ 门下省审核通过（自动）
-6️⃣ 尚书省执行计划（自动）
-7️⃣ 各部逐步完成（自动）
+【第 3-7 步 - 自动执行】
+2️⃣ 皇帝分析意图、自动选择工作域（自动）
+3️⃣ 中书省制定计划（自动）
+4️⃣ 门下省审核通过（自动）
+5️⃣ 尚书省执行计划（自动）
+6️⃣ 各部逐步完成（自动）
    ↓
 【最终 - 用户验收】
 皇帝最终验收（手动确认）
@@ -72,8 +71,7 @@ npm install @deep-flux/liubu
 |------|------|------|------|
 | 1 | 用户 | `/start` | 提交任务描述 |
 | 2 | 用户 | `set_variables` | 设置任务变量（模块名、资产类型等） |
-| 3 | 用户 | `/switch-domain` | **选择工作域**（asset-management/cr-processing 等） |
-| 4-7 | 自动 | 内部执行 | 三省六部自动协作完成任务 |
+| 3-7 | 自动 | 内部执行 | 皇帝自动分析意图、选择工作域，三省六部协作完成任务 |
 | 8 | 用户 | 审阅结果 | 查看输出并验收 |
 
 ### 可用命令
@@ -88,9 +86,6 @@ set_variables({
   asset_type: "service"
 })
 
-# 【第3步】选择工作域（必需）
-/switch-domain asset-management
-
 # 【其他】查看状态
 /status
 
@@ -102,14 +97,12 @@ set_variables({
 
 ```bash
 # 例 1：提取资产
-/switch-domain asset-management    # 👈 手动选择域
-/start 从 src/ 目录提取所有资产    # 👈 手动启动
-# 之后系统自动执行，无需人工干预
+/start 从 src/ 目录提取所有资产
+# 系统自动分析意图 → 选择 asset-management 域 → 执行
 
 # 例 2：CR 流程
-/switch-domain cr-processing       # 👈 手动选择域
 /cr-start asset_type=service asset_name=auth-service cr_description="添加 OAuth"
-# 之后系统自动执行变更流程
+# 系统自动分析意图 → 选择 cr-processing 域 → 执行
 ```
 
 ---
@@ -149,7 +142,7 @@ set_variables({
 
 ### 皇帝的职责
 1. 接收用户意图
-2. 选择工作域
+2. 自动分析意图、智能选择工作域
 3. 下达任务给三省
 4. 监控全局进度
 5. 最终验收
@@ -171,14 +164,14 @@ set_variables({
 
 ### 简单场景
 ```bash
-/switch-domain asset-management
 /start 从 src/ 目录提取所有资产
+# 系统自动识别为 asset-management 工作流
 ```
 
 ### 复杂场景
 ```bash
-/switch-domain cr-processing
 /cr-start asset_type=service asset_name=auth-service cr_description="添加 OAuth 2.0 支持，需要修改接口"
+# 系统自动识别为 cr-processing 工作流
 ```
 
 ---
@@ -243,9 +236,6 @@ set_variables({
 ```bash
 # 查看状态
 /status
-
-# 切换域
-/switch-domain [domain-name]
 
 # 启动任务
 /start [task-description]
