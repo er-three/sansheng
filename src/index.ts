@@ -226,18 +226,37 @@ All agents are ready for coordination!
 
       listDomainRecipes: tool({
         description:
-          "List recipes for a specific domain (asset-management or reverse-engineering) - 列出特定域的流程配方",
+          "List recipes for all domains - 列出所有域的流程配方",
         args: {},
         async execute() {
           return `
-Available domains with recipes:
-1. asset-management - 资产管理和提取
-   Recipes: quick (5min), standard (15min), complete (25min)
+[ALL DOMAINS] - 所有可用的工作域和配方
 
-2. reverse-engineering - 逆向工程和迁移
-   Recipes: frontend-only, standard, migration, full-stack, high-risk
+1. general - 通用编程
+   ├─ quick_fix (3 步)     - 简单修复 (5min, ~70K token)
+   ├─ standard (4 步)      - 标准流程 (10min, ~120K token)
+   └─ comprehensive (6 步) - 强化审计 (15min, ~180K token)
 
-Use: @selectDomain to choose a domain and recipe.
+2. cr-processing - 变更请求处理
+   ├─ hotfix (4 步)    - 紧急修复 (5min, ~90K token)
+   ├─ standard (5 步)  - 标准流程 (12min, ~140K token)
+   └─ complete (8 步)  - 完整版本 (20min, ~200K token)
+
+3. asset-management - 资产提取和管理
+   ├─ quick (4 步)     - 快速提取 (5min, ~55K token)
+   ├─ standard (8 步)  - 标准提取 (15min, ~125K token)
+   └─ complete (10 步) - 完整提取 (25min, ~175K token)
+
+4. reverse-engineering - 逆向工程和迁移
+   ├─ frontend-only (6 步)  - 前端专用 (5min, ~90K token)
+   ├─ migration (6 步)      - 快速迁移 (10min, ~110K token)
+   ├─ standard (7 步)       - 标准迁移 (12min, ~135K token)
+   ├─ full-stack (10 步)    - 完整系统 (20min, ~200K token)
+   └─ high-risk (12 步)     - 高风险系统 (25min, ~225K token)
+
+总计：4 个域 × 平均 5 个配方 = 20 个工作流模式可选
+
+使用：@selectDomain 选择你需要的域和配方
 `.trim()
         }
       }),
@@ -248,16 +267,30 @@ Use: @selectDomain to choose a domain and recipe.
         args: {},
         async execute() {
           return `
-[INFO] Domain Selection
+[INFO] Domain Selection - 选择工作域
 
-选择你的工作域和配方：
+所有可用的工作域和配方：
+
+【通用编程（general）】
+  @initGeneralWorkflow
+
+  快速修复：  "quick_fix"      - 简单修复 (5min, ~70K token)
+  标准流程：  "standard"       - 完整流程 (10min, ~120K token)
+  加强流程：  "comprehensive"  - 强化审计 (15min, ~180K token)
+
+【变更请求（cr-processing）】
+  @initCRProcessingWorkflow
+
+  紧急修复：  "hotfix"    - 线上 bug (5min, ~90K token)
+  标准 CR：   "standard"  - 正常变更 (12min, ~140K token)
+  完整版本：  "complete"  - 重大变更 (20min, ~200K token)
 
 【资产管理（asset-management）】
   @initAssetManagementWorkflow
 
-  快速提取：  "quick"    - 仅核心资产 (5min, ~55K token)
-  标准提取：  "standard" - 完整资产 (15min, ~125K token)
-  完整提取：  "complete" - 强化检查 (25min, ~175K token)
+  快速提取：  "quick"     - 仅核心资产 (5min, ~55K token)
+  标准提取：  "standard"  - 完整资产 (15min, ~125K token)
+  完整提取：  "complete"  - 强化检查 (25min, ~175K token)
 
 【逆向工程（reverse-engineering）】
   @initReverseEngineeringWorkflow
@@ -268,12 +301,18 @@ Use: @selectDomain to choose a domain and recipe.
   完整系统：  "full_stack"    - 复杂系统 (20min, ~200K token)
   高风险系统："high_risk"     - 关键应用 (25min, ~225K token)
 
-示例用法：
-  选择资产快速提取：
-  "我想要做资产快速提取，用 quick 模式"
+使用示例：
+  修复简单 bug：
+  "我要修复一个 bug，用通用编程的 quick_fix 模式"
 
-  选择逆向工程标准迁移：
-  "我想要做 Ionic 迁移，用标准流程"
+  线上紧急修复：
+  "线上 bug，用 cr-processing 的 hotfix 模式"
+
+  资产快速提取：
+  "我想要快速提取资产，用 asset-management 的 quick 模式"
+
+  Ionic 迁移：
+  "迁移 Ionic 应用，用 reverse-engineering 的 standard 模式"
 `.trim()
         }
       }),
@@ -322,6 +361,66 @@ Use: @selectDomain to choose a domain and recipe.
   ✅ 加载 Section 2A 路径表
   ✅ 准备 yibu, gongbu, xingbu, bingbu Agent
   ✅ 开始 infrastructure 步骤
+`.trim()
+        }
+      }),
+
+      initGeneralWorkflow: tool({
+        description: "Initialize general programming workflow - 初始化通用编程工作流",
+        args: {},
+        async execute() {
+          return `
+[INFO] General Programming Workflow Initialization
+
+使用方式：
+1. 选择配方：quick-fix / standard / comprehensive
+2. 描述你的编程任务
+3. 系统会创建对应的任务队列
+
+配方说明：
+  • quick-fix (3 步)     - 简单修复，skip 验证 (~70K token, 5min)
+  • standard (4 步)      - 标准流程，完整分析-实现-验证 (~120K token, 10min)
+  • comprehensive (6 步) - 加强版，包含性能和安全审计 (~180K token, 15min)
+
+示例：
+  "我要修复一个简单的 bug，用 quick-fix"
+  "我要开发一个新功能，用 standard"
+  "我要开发关键模块，用 comprehensive"
+
+系统会：
+  ✅ 初始化编程工作流
+  ✅ 准备 yibu, hubu, gongbu, bingbu, xingbu Agent
+  ✅ 开始 analyze 步骤
+`.trim()
+        }
+      }),
+
+      initCRProcessingWorkflow: tool({
+        description: "Initialize change request processing workflow - 初始化变更请求工作流",
+        args: {},
+        async execute() {
+          return `
+[INFO] Change Request Processing Workflow Initialization
+
+使用方式：
+1. 选择配方：hotfix / standard / complete
+2. 描述变更请求的内容
+3. 系统会创建对应的任务队列
+
+配方说明：
+  • hotfix (4 步)    - 紧急修复，skip 规格设计 (~90K token, 5min)
+  • standard (5 步)  - 标准流程，完整提议-规格-实现-持久化 (~140K token, 12min)
+  • complete (8 步)  - 完整版本，包含兼容性审计 (~200K token, 20min)
+
+示例：
+  "线上 bug 修复，用 hotfix"
+  "新功能的 CR，用 standard"
+  "API 升级，用 complete"
+
+系统会：
+  ✅ 初始化 CR 工作流
+  ✅ 准备 yibu, hubu, libu, xingbu, gongbu, kubu Agent
+  ✅ 开始 cr-proposal 步骤
 `.trim()
         }
       })
