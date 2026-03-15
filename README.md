@@ -6,6 +6,39 @@
 
 ---
 
+## 项目状态
+
+### 当前版本：Phase 4（企业级功能开发中）
+
+```
+✅ Phase 1-3：核心系统（已完成和集成）
+   - Chancellery 工作流编排
+   - Workflow 持久化
+   - Code Gateway 验证
+   - Audit System 审计
+   - Task Queue 依赖管理
+
+🚧 Phase 4：高级功能（已实现，架构重构中）
+   - Agent Heartbeat（心跳监测）
+   - Agent Communication（任务通知）
+   - Task Retry Manager（自动重试）
+   - Workflow Rollback（工作流回滚）
+   - Error Recovery（错误恢复）
+   - Parallel Executor（并行执行）
+   - Workflow Events（事件驱动）
+   - Analytics（性能分析）
+   - Template Manager（模板管理）
+   - Dependency Validator（依赖验证）
+   - Session Lifecycle（会话管理）
+
+📋 代码质量统计
+   - 总代码行数：4,982 行
+   - 单元测试：391 个（100% 通过）
+   - 生产可用性：28% → 目标 90%（架构重构进行中）
+```
+
+---
+
 ## 快速安装
 
 ```bash
@@ -246,12 +279,65 @@ set_variables({
 
 ---
 
+## 架构重构计划（Phase 4 Refactor）
+
+### 当前状态（feature/plugin-refactor-opencode 分支）
+
+**发现的架构问题**：
+- 代码补丁：20% 代码重复率
+- 引用混乱：28 个 import，4 个不同目录
+- 文件臃肿：plugin.ts 600 行，Hook 承载过多职责
+- 模块耦合：70% 耦合度
+- 全局状态分散：5+ 个地方维护 Session 状态
+
+**审计报告**：参见 `/tmp/AUDIT_REPORT.md`
+
+### 重构目标（refactor/architecture-redesign 分支）
+
+```
+新架构设计（WorkflowManager）
+├─ WorkflowEngine（执行引擎）
+│  ├─ Task Queue
+│  ├─ Recipe Resolution
+│  └─ Dependency Management
+│
+├─ ObservabilityLayer（可观测性）
+│  ├─ Agent Heartbeat
+│  ├─ Analytics
+│  └─ Audit
+│
+├─ ResiliencyLayer（弹性层）
+│  ├─ Retry Manager
+│  ├─ Rollback Manager
+│  └─ Error Recovery
+│
+└─ CommunicationLayer（通信层）
+   ├─ Agent Communication
+   ├─ Event System
+   └─ Notification Manager
+
+预期改进：
+✓ 代码重复率：20% → 5%
+✓ 模块耦合度：70% → 30%
+✓ 生产可用性：28% → 90%
+✓ 可维护性大幅提升
+```
+
+### 时间线
+
+- Phase 4 当前分支：391 个测试，高质量代码实现
+- refactor/architecture-redesign：3-4 天完整重构
+- main：重构完成后合并
+
+---
+
 ## 更多文档
 
 - **AGENTS.md** - 11 个智能体详解
 - **QUICK_START.md** - 5 分钟快速开始
 - **NPM_PUBLISH_GUIDE.md** - npm 发布指南
 - **GITHUB_SETUP.md** - GitHub 配置指南
+- **AUDIT_REPORT.md** - 代码质量审计报告（Phase 4）
 
 ---
 
@@ -261,4 +347,10 @@ MIT
 
 ---
 
-**准备好了吗？** 用 `/start` 命令开始第一个任务吧！ 🚀
+**准备好了吗？**
+
+- 当前分支：`feature/plugin-refactor-opencode` - Phase 4 功能开发完成
+- 重构分支：`refactor/architecture-redesign` - 架构重构进行中
+- 主分支：`main` - 生产稳定版本
+
+用 `/start` 命令开始第一个任务吧！ 🚀

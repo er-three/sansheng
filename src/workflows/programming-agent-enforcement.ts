@@ -8,6 +8,7 @@
 
 import { log } from "../utils.js"
 import { getTaskQueue } from "../session/task-queue.js"
+import { isNextModificationBlocked, getTestBlockingReason } from "./test-enforcement.js"
 
 /**
  * 代码修改检查结果
@@ -164,6 +165,21 @@ export function validateCodeModification(
           ]
         }
       }
+    }
+  }
+
+  // 检查 6: 测试状态检查（Phase 3）
+  if (isNextModificationBlocked(sessionId)) {
+    const blockingReason = getTestBlockingReason(sessionId)
+    return {
+      allowed: false,
+      reason: blockingReason || "[PROGRAMMING AGENT] 上一次修改的测试失败，无法执行新的修改",
+      requiredSteps: [
+        "1. 修复失败的测试",
+        "2. 重新运行测试直到全部通过",
+        "3. 声明测试结果 @declareTestResult",
+        "4. 然后继续执行代码修改"
+      ]
     }
   }
 

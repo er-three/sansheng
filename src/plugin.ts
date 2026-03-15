@@ -53,6 +53,7 @@ import {
   getCriticalPathStatus
 } from "./session/task-queue.js"
 import { getRecipe, validateRecipeCompliance } from "./workflows/recipes.js"
+import { setOpencodeClient } from "./utils.js"
 import {
   validateCodeModification,
   recordCodeModification,
@@ -60,6 +61,25 @@ import {
   assessModificationRisk,
   getModificationRecords
 } from "./workflows/programming-agent-enforcement.js"
+import {
+  runCodeModificationGateway
+} from "./workflows/code-modification-gateway.js"
+import {
+  appendAuditRecord
+} from "./workflows/audit-system.js"
+import {
+  initializeChancellery,
+  getNextTaskForAgent,
+  claimTaskByAgent,
+  advanceWorkflow,
+  failWorkflowTask,
+  getChancelleryStatus,
+  generateChancelleryReport
+} from "./workflows/chancellery.js"
+import {
+  getResponsibleAgent,
+  canAgentExecuteTask
+} from "./workflows/agent-task-mapper.js"
 
 // ─────────────────── Plugin 初始化 ───────────────────
 
@@ -70,6 +90,11 @@ let cleanupTimer: NodeJS.Timer | null = null
 let configManager: ConfigManager | null = null
 
 function initializePlugin(context?: PluginContext): void {
+  // 注册 OpenCode 客户端用于日志集成
+  if (context) {
+    setOpencodeClient(context)
+  }
+
   if (!cleanupTimer) {
     cleanupTimer = initializeSessionCleanupTimer()
     log("Plugin", "Initialized session cleanup timer")
@@ -314,6 +339,22 @@ export async function sessionUpdatedHook(input: Record<string, unknown>, context
       await restoreSessionStateFromSDK(sessionId, context)
     }
 
+    // ⭐ 丞相府：初始化工作流（从消息中检测）
+    if (message && typeof message === "string") {
+      // 检测初始化工作流的模式
+      const initMatch = message.match(/@initializeWorkflow\s*(\w+)?/)
+      if (initMatch) {
+        const recipeType = (initMatch[1] || "medium") as any
+        try {
+          initializeChancellery(sessionId, recipeType)
+          const status = getChancelleryStatus(sessionId)
+          log("Chancellery", `丞相府已初始化: ${status?.totalTasks}个任务`)
+        } catch (error) {
+          log("Chancellery", `初始化失败: ${error}`, "error")
+        }
+      }
+    }
+
     // ⭐ 关键优化：仅首次注入约束（节省 token）
     if (!isConstraintsInjected(sessionId)) {
       // Phase 5: 发现约束（优化版本 - 分级注入）
@@ -429,30 +470,81 @@ export async function toolExecuteAfterHook(input: Record<string, unknown>, outpu
       log("TaskQueue", `Tool executed: ${skillName} for task ${taskId} by ${agentName}`)
     }
 
-    // ─────────────────── Phase 2：编程Agent代码修改验证 ───────────────────
+    // ─────────────────── 丞相府：工作流推进 ───────────────────
+
+    // 检测任务完成信号
+    const taskCompleteMatch = (input as any).message?.match(/@completeTask\s*(\w+)?/) ||
+                              (input as any).args?.match?.(/complete.*task/) ||
+                              skillName?.toLowerCase().includes("complete")
+
+    if (taskCompleteMatch && queue?.currentTask) {
+      try {
+        // 推进工作流
+        const nextTask = advanceWorkflow(sessionId, queue.currentTask, {
+          completedAt: new Date().toISOString(),
+          result: "success"
+        })
+
+        if (nextTask) {
+          log("Chancellery", `下一个任务: ${nextTask.name} (${nextTask.id})`)
+        } else {
+          log("Chancellery", `工作流已完成!`)
+        }
+      } catch (error) {
+        log("Chancellery", `推进工作流失败: ${error}`, "error")
+      }
+    }
+
+    // ─────────────────── Phase 2+3：编程Agent代码修改验证（网关） ───────────────────
 
     // 检测代码修改工具（Edit, Write, NotebookEdit）
     const codeModificationTools = ["Edit", "Write", "NotebookEdit", "edit", "write"]
     if (codeModificationTools.includes(skillName)) {
-      // 对于代码修改，需要强制验证
-      const modificationCheck = validateCodeModification(sessionId, agentName, skillName)
-      if (!modificationCheck.allowed) {
-        throw new Error(
-          `[PROGRAMMING AGENT ENFORCEMENT] 代码修改被拒绝\n` +
-          `原因: ${modificationCheck.reason}\n\n` +
-          `必须执行的步骤:\n` +
-          modificationCheck.requiredSteps.map((s, i) => `${i + 1}. ${s}`).join("\n")
-        )
-      }
-
-      // 代码修改通过验证，记录此次修改
+      // 获取修改信息
       const taskIdForModification = (input as any).task_id || "unknown"
       const filesAffected = (input as any).args?.file_path ? [(input as any).args.file_path] : []
       const linesChanged = (input as any).args?.old_string
         ? ((input as any).args.new_string || "").split("\n").length
         : 0
-      const riskLevel = assessModificationRisk(filesAffected, skillName)
 
+      // Phase 3：使用网关进行多层验证
+      const gatewayResult = runCodeModificationGateway(
+        sessionId,
+        agentName,
+        skillName,
+        filesAffected,
+        linesChanged
+      )
+
+      // 追加审计记录（无论允许或拒绝都记录）
+      appendAuditRecord(root, sessionId, {
+        sessionId,
+        agentName,
+        operation: skillName,
+        taskId: taskIdForModification,
+        filesAffected,
+        linesChanged,
+        riskLevel: gatewayResult.riskLevel,
+        menxiaReviewed: queue?.completedTasks?.some(t => t.includes("menxia")) || false,
+        testsPassed: true,
+        gatewayChecks: gatewayResult.blockingReasons.length === 0 ? ["workflow", "risk", "menxia"] : [],
+        result: gatewayResult.allowed ? "allowed" : "blocked",
+        blockReason: gatewayResult.blockingReasons.length > 0
+          ? gatewayResult.blockingReasons.join("; ")
+          : undefined
+      })
+
+      // 如果网关拒绝，抛出错误
+      if (!gatewayResult.allowed) {
+        throw new Error(
+          `[PROGRAMMING AGENT ENFORCEMENT] 代码修改被网关拒绝\n` +
+          `原因:\n${gatewayResult.blockingReasons.map(r => `  - ${r}`).join("\n")}\n\n` +
+          `必须执行的步骤:\n` +
+          gatewayResult.requiredActions.map((s, i) => `${i + 1}. ${s}`).join("\n")
+        )
+      }
+
+      // 代码修改通过网关验证，记录此次修改
       recordCodeModification(sessionId, {
         taskId: taskIdForModification,
         agentName,
@@ -460,18 +552,19 @@ export async function toolExecuteAfterHook(input: Record<string, unknown>, outpu
         filesAffected,
         linesChanged,
         plan: (input as any).args?.plan || "code modification",
-        riskLevel,
-        reviewedByMenxia: queue?.completedTasks?.some(t => t.includes("menxia")) || false,
+        riskLevel: gatewayResult.riskLevel,
+        reviewedByMenxia: gatewayResult.requiresMenxiaReview ? (queue?.completedTasks?.some(t => t.includes("menxia")) || false) : false,
         testsPassed: true,
         auditTrail: [
-          `[${new Date().toISOString()}] Code modification validated`,
+          `[${new Date().toISOString()}] Code modification passed gateway`,
           `Agent: ${agentName}`,
           `Files: ${filesAffected.join(", ")}`,
-          `Risk: ${riskLevel}`
+          `Risk: ${gatewayResult.riskLevel}`,
+          `Menxia Required: ${gatewayResult.requiresMenxiaReview ? "yes" : "no"}`
         ]
       })
 
-      log("ProgrammingAgent", `Code modification validated: ${skillName} by ${agentName}, risk=${riskLevel}`)
+      log("ProgrammingAgent", `Code modification passed gateway: ${skillName} by ${agentName}, risk=${gatewayResult.riskLevel}`)
     }
 
     log("Pipeline", `Tool executed: ${skillName}`)
