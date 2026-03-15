@@ -257,7 +257,7 @@ export async function sessionCreatedHook(input: Record<string, unknown>, context
 }
 
 /**
- * Session Updated Hook - 注入约束（仅首次）
+ * Session Updated Hook - 注入约束（仅首次）+ 任务队列消息解析
  */
 export async function sessionUpdatedHook(input: Record<string, unknown>, context?: PluginContext) {
   try {
@@ -274,6 +274,33 @@ export async function sessionUpdatedHook(input: Record<string, unknown>, context
     const sessionId = (input as any).id || (input as any).sessionId || "default"
     const agentType = (input as any).agent_type || "unknown"
     const agentName = (input as any).agent_name || agentType
+
+    // ⭐ 新增：从消息中提取任务信息（用于任务队列系统）
+    const message = (input as any).message || (input as any).content || ""
+    if (message && typeof message === "string") {
+      // 检测声明任务的模式（支持英文和中文）
+      if (message.includes("claim") || message.includes("声明")) {
+        const taskMatch = message.match(/(\w+)/)
+        if (taskMatch) {
+          const taskId = taskMatch[1]
+          ;(globalThis as any).__claimTaskId__ = taskId
+          ;(globalThis as any).__sessionId__ = sessionId
+          ;(globalThis as any).__agentName__ = agentName
+          log("TaskQueue", `Detected claim task: ${taskId} by ${agentName}`)
+        }
+      }
+
+      // 检测完成任务的模式（支持英文和中文）
+      if (message.includes("complete") || message.includes("完成")) {
+        const taskMatch = message.match(/(\w+)/)
+        if (taskMatch) {
+          const taskId = taskMatch[1]
+          ;(globalThis as any).__completeTaskId__ = taskId
+          ;(globalThis as any).__sessionId__ = sessionId
+          log("TaskQueue", `Detected complete task: ${taskId}`)
+        }
+      }
+    }
 
     // Phase 3: 从官方 SDK 恢复 Session 状态（支持 Session 恢复）
     if (context) {

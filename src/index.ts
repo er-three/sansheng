@@ -180,40 +180,92 @@ All agents are ready for coordination!
 
       claimTaskTool: tool({
         description:
-          "Claim a task to start working on it - 声明任务。用法说明请查看文档。",
+          "Claim a task - 声明任务。在消息中包含任务ID（如 understand, plan, execute）",
         args: {},
-        async execute() {
-          return `
-[INFO] Claim Task Tool
+        async execute(input: any) {
+          const sessionId = (globalThis as any).__sessionId__ || "default"
+          const agentName = (globalThis as any).__agentName__ || "unknown"
+          const taskId = (globalThis as any).__claimTaskId__
 
-用法：在你的消息中说明你要做的任务，系统会自动追踪。
+          if (!taskId) {
+            return `
+[INFO] 声明任务工具
+
+用法：先说明要声明什么任务，然后系统会自动追踪。
 
 示例：
-  "我现在开始做 understand 任务"
+  "我现在声明 understand 任务"
   "我声明 plan 任务"
-  "开始执行 execute 任务"
+  "声明 execute 任务"
 
-任务 ID 列表，使用 @getTaskQueue 查看。
+查看可用任务：@getTaskQueue
 `.trim()
+          }
+
+          try {
+            const task = claimTask(sessionId, taskId, agentName)
+            return `
+[OK] 任务已声明
+
+[任务详情]
+ID: ${task.id}
+名称: ${task.name}
+声明者: ${agentName}
+状态: claimed
+
+开始执行此任务！
+`.trim()
+          } catch (error) {
+            return `
+[FAILED] 声明任务失败: ${error}
+
+查看任务列表：@getTaskQueue
+`.trim()
+          }
         }
       }),
 
       completeTaskTool: tool({
-        description: "Mark a task as completed - 标记任务完成",
+        description: "Complete a task - 完成任务。在消息中包含任务ID",
         args: {},
-        async execute() {
-          return `
-[INFO] Complete Task Tool
+        async execute(input: any) {
+          const sessionId = (globalThis as any).__sessionId__ || "default"
+          const taskId = (globalThis as any).__completeTaskId__
 
-用法：在你的消息中说明任务完成，系统会自动追踪。
+          if (!taskId) {
+            return `
+[INFO] 完成任务工具
+
+用法：先说明完成什么任务，然后系统会自动追踪。
 
 示例：
-  "understand 任务完成，我理解了需求"
-  "plan 任务完成，计划已制定"
-  "执行完成，所有步骤已执行"
+  "understand 任务完成"
+  "plan 任务完成"
+  "execute 任务完成"
 
-使用 @getTaskQueue 查看下一步任务。
+查看任务列表：@getTaskQueue
 `.trim()
+          }
+
+          try {
+            const task = completeTask(sessionId, taskId)
+            return `
+[OK] 任务已完成
+
+[任务详情]
+ID: ${task.id}
+名称: ${task.name}
+状态: done
+
+下一步任务：@getTaskQueue
+`.trim()
+          } catch (error) {
+            return `
+[FAILED] 完成任务失败: ${error}
+
+查看任务列表：@getTaskQueue
+`.trim()
+          }
         }
       }),
 
