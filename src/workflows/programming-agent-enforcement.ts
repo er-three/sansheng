@@ -6,7 +6,7 @@
  * - Phase 3: 完整的追踪和验证
  */
 
-import { log } from "../utils.js"
+import { log, isTaskCompleted } from "../utils.js"
 import { getTaskQueue } from "../session/task-queue.js"
 import { isNextModificationBlocked, getTestBlockingReason } from "./test-enforcement.js"
 
@@ -113,9 +113,9 @@ export function validateCodeModification(
     }
   }
 
-  // 检查 4: 前置任务是否都完成了？
+  // 检查 4: 前置任务是否都完成了？（使用 Set 缓存优化）
   const incompleteDeps = currentTask.dependencies.filter(
-    dep => !queue.completedTasks.includes(dep)
+    dep => !isTaskCompleted(dep, queue.completedTasks, queue.completedTasksSet)
   )
   if (incompleteDeps.length > 0) {
     const depNames = incompleteDeps

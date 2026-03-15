@@ -9,7 +9,7 @@
  */
 
 import { WorkflowTask, TaskQueue } from "../types.js"
-import { log } from "../utils.js"
+import { log, syncCompletedTasksSet, isTaskCompleted } from "../utils.js"
 
 // 全局任务队列存储（按 sessionId）
 const taskQueues = new Map<string, TaskQueue>()
@@ -75,9 +75,9 @@ export function claimTask(sessionId: string, taskId: string, agentName: string):
     )
   }
 
-  // 检查 1: 依赖是否都完成了？
+  // 检查 1: 依赖是否都完成了？（使用 Set 缓存优化）
   const incompleteDeps = task.dependencies.filter(
-    dep => !queue.completedTasks.includes(dep)
+    dep => !isTaskCompleted(dep, queue.completedTasks, queue.completedTasksSet)
   )
   if (incompleteDeps.length > 0) {
     const incompleteNames = incompleteDeps
@@ -139,8 +139,9 @@ export function completeTask(
     task.outputs = outputs
   }
 
-  // 添加到已完成列表
+  // 添加到已完成列表（并同步 Set 缓存）
   queue.completedTasks.push(taskId)
+  syncCompletedTasksSet(queue, taskId)
   queue.currentTask = null
   queue.updatedAt = Date.now()
 

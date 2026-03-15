@@ -43,7 +43,7 @@ import {
 } from "./session/state.js"
 import { createConfigManager, ConfigManager } from "./config/manager.js"
 import { getConstraintInjectionProfile, estimateSavingsPercentage } from "./config/constraint-profile.js"
-import { formatConstraints, findRoot, log } from "./utils.js"
+import { formatConstraints, findRoot, log, isTaskCompleted } from "./utils.js"
 import {
   getTaskQueue,
   claimTask,
@@ -444,9 +444,9 @@ export async function toolExecuteAfterHook(input: Record<string, unknown>, outpu
         )
       }
 
-      // 检查 3: 任务的依赖是否都完成了？
+      // 检查 3: 任务的依赖是否都完成了？（使用 Set 缓存优化）
       const incompleteDeps = task.dependencies.filter(
-        dep => !queue.completedTasks.includes(dep)
+        dep => !isTaskCompleted(dep, queue.completedTasks, queue.completedTasksSet)
       )
       if (incompleteDeps.length > 0) {
         const incompleteNames = incompleteDeps

@@ -150,6 +150,7 @@ export interface TaskQueue {
   tasks: WorkflowTask[]
   currentTask: string | null
   completedTasks: string[]
+  completedTasksSet?: Set<string>  // Performance: O(1) lookup cache (not serialized)
   recipeType: "simple" | "medium" | "complex" | "high_risk"
   createdAt: number
   updatedAt: number
