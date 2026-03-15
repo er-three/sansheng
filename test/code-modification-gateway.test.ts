@@ -15,13 +15,13 @@ describe("CodeModificationGateway", () => {
   })
 
   it("should reject modification when no workflow exists", () => {
-    const result = runCodeModificationGateway(
-      "nonexistent-session",
-      "testAgent",
-      "Edit",
-      ["src/test.ts"],
-      10
-    )
+    const result = runCodeModificationGateway({
+      sessionId: "nonexistent-session",
+      agentName: "testAgent",
+      operation: "Edit",
+      filesAffected: ["src/test.ts"],
+      linesChanged: 10
+    })
 
     expect(result.allowed).toBe(false)
     expect(result.blockingReasons.length).toBeGreaterThan(0)
@@ -31,13 +31,13 @@ describe("CodeModificationGateway", () => {
   it("should reject modification when no current task", () => {
     createTaskQueue(sessionId, "simple")
 
-    const result = runCodeModificationGateway(
+    const result = runCodeModificationGateway({
       sessionId,
-      "testAgent",
-      "Edit",
-      ["src/test.ts"],
-      10
-    )
+      agentName: "testAgent",
+      operation: "Edit",
+      filesAffected: ["src/test.ts"],
+      linesChanged: 10
+    })
 
     expect(result.allowed).toBe(false)
     expect(result.blockingReasons[0]).toContain("没有声明当前任务")
@@ -61,13 +61,13 @@ describe("CodeModificationGateway", () => {
     claimTask(sessionId, task.id, "testAgent")
 
     // Execute - use a file that's not in high-risk patterns
-    const result = runCodeModificationGateway(
-      sessionId,
-      "testAgent",
-      "Edit",
-      ["src/helpers.ts"],
-      15
-    )
+    const result = runCodeModificationGateway({
+      sessionId: sessionId,
+      agentName: "testAgent",
+      operation: "Edit",
+      filesAffected: ["src/helpers.ts"],
+      linesChanged: 15
+    })
 
     // Verify
     expect(result.allowed).toBe(true)
@@ -100,13 +100,13 @@ describe("CodeModificationGateway", () => {
     claimTask(sessionId, task.id, "testAgent")
 
     // Execute - high risk file and large change will trigger menxia requirement
-    const result = runCodeModificationGateway(
-      sessionId,
-      "testAgent",
-      "Edit",
-      ["src/api/types.ts"],
-      100
-    )
+    const result = runCodeModificationGateway({
+      sessionId: sessionId,
+      agentName: "testAgent",
+      operation: "Edit",
+      filesAffected: ["src/api/types.ts"],
+      linesChanged: 100
+    })
 
     // Verify
     expect(result.requiresMenxiaReview).toBe(true)
@@ -148,13 +148,13 @@ describe("CodeModificationGateway", () => {
     claimTask(sessionId, task.id, "testAgent")
 
     // Execute
-    const result = runCodeModificationGateway(
-      sessionId,
-      "testAgent",
-      "Edit",
-      ["src/api/types.ts", "src/config.ts"],
-      100
-    )
+    const result = runCodeModificationGateway({
+      sessionId: sessionId,
+      agentName: "testAgent",
+      operation: "Edit",
+      filesAffected: ["src/api/types.ts", "src/config.ts"],
+      linesChanged: 100
+    })
 
     // Verify
     expect(result.allowed).toBe(true)
@@ -179,13 +179,13 @@ describe("CodeModificationGateway", () => {
     claimTask(sessionId, task.id, "testAgent")
 
     // Execute with config file (high risk pattern)
-    const result = runCodeModificationGateway(
-      sessionId,
-      "testAgent",
-      "Edit",
-      ["src/config/app.config.ts"],
-      25
-    )
+    const result = runCodeModificationGateway({
+      sessionId: sessionId,
+      agentName: "testAgent",
+      operation: "Edit",
+      filesAffected: ["src/config/app.config.ts"],
+      linesChanged: 25
+    })
 
     // Verify
     expect(result.riskLevel).toBe("high")
@@ -210,13 +210,13 @@ describe("CodeModificationGateway", () => {
     claimTask(sessionId, task.id, "testAgent")
 
     // Execute with 3 files (medium risk, but >= 2 files triggers menxia)
-    const result = runCodeModificationGateway(
-      sessionId,
-      "testAgent",
-      "Edit",
-      ["src/file1.ts", "src/file2.ts", "src/file3.ts"],
-      30
-    )
+    const result = runCodeModificationGateway({
+      sessionId: sessionId,
+      agentName: "testAgent",
+      operation: "Edit",
+      filesAffected: ["src/file1.ts", "src/file2.ts", "src/file3.ts"],
+      linesChanged: 30
+    })
 
     // Verify
     expect(result.riskLevel).toBe("medium")
@@ -242,13 +242,13 @@ describe("CodeModificationGateway", () => {
     claimTask(sessionId, task.id, "testAgent")
 
     // Execute with 50+ lines changed
-    const result = runCodeModificationGateway(
-      sessionId,
-      "testAgent",
-      "Edit",
-      ["src/utils.ts"],
-      50
-    )
+    const result = runCodeModificationGateway({
+      sessionId: sessionId,
+      agentName: "testAgent",
+      operation: "Edit",
+      filesAffected: ["src/utils.ts"],
+      linesChanged: 50
+    })
 
     // Verify
     expect(result.requiresMenxiaReview).toBe(true)
@@ -287,13 +287,13 @@ describe("CodeModificationGateway", () => {
     claimTask(sessionId, task.id, "testAgent")
 
     // Execute with high-risk file
-    const result = runCodeModificationGateway(
-      sessionId,
-      "testAgent",
-      "Edit",
-      ["src/api/index.ts"],
-      75
-    )
+    const result = runCodeModificationGateway({
+      sessionId: sessionId,
+      agentName: "testAgent",
+      operation: "Edit",
+      filesAffected: ["src/api/index.ts"],
+      linesChanged: 75
+    })
 
     // Verify - with menxia completed, it should be allowed
     expect(result.allowed).toBe(true)

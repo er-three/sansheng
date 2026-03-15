@@ -15,6 +15,20 @@ import {
   assessModificationRisk,
   shouldRequireMenxiaReview
 } from "./programming-agent-enforcement.js"
+import { LOG_COMPONENT, RISK_LEVEL } from "../constants/index.js"
+
+/**
+ * 代码修改请求对象
+ *
+ * 避免参数爆炸，将 5 个参数统一为单一对象参数
+ */
+export interface CodeModificationRequest {
+  sessionId: string
+  agentName: string
+  operation: string
+  filesAffected: string[]
+  linesChanged: number
+}
 
 /**
  * 网关验证结果
@@ -32,18 +46,16 @@ export interface GatewayResult {
  *
  * 这是 Phase 3 的核心，在 tool.execute.after Hook 中调用
  * 替代原有的单层 validateCodeModification 检查
+ *
+ * @param req - 代码修改请求对象
+ * @returns 网关验证结果
  */
-export function runCodeModificationGateway(
-  sessionId: string,
-  agentName: string,
-  operation: string,
-  filesAffected: string[],
-  linesChanged: number
-): GatewayResult {
+export function runCodeModificationGateway(req: CodeModificationRequest): GatewayResult {
+  const { sessionId, agentName, operation, filesAffected, linesChanged } = req
   const blockingReasons: string[] = []
   const requiredActions: string[] = []
 
-  log("Gateway", `Starting code modification gateway for ${agentName}, operation: ${operation}`)
+  log(LOG_COMPONENT.GATEWAY, `Starting code modification gateway for ${agentName}, operation: ${operation}`)
 
   // 第1层：工作流状态检查
   const workflowCheck = validateCodeModification(sessionId, agentName, operation)
@@ -62,7 +74,7 @@ export function runCodeModificationGateway(
 
   // 第2层：风险评估
   const riskLevel = assessModificationRisk(filesAffected, operation)
-  log("Gateway", `Risk assessment: ${riskLevel} (files: ${filesAffected.length}, lines: ${linesChanged})`)
+  log(LOG_COMPONENT.GATEWAY, `Risk assessment: ${riskLevel} (files: ${filesAffected.length}, lines: ${linesChanged})`)
 
   // 第3层：判断是否需要 menxia 审核
   const requiresMenxiaReview = shouldRequireMenxiaReview(
@@ -102,7 +114,7 @@ export function runCodeModificationGateway(
   // 如果有阻塞原因，拒绝执行
   if (blockingReasons.length > 0) {
     log(
-      "Gateway",
+      LOG_COMPONENT.GATEWAY,
       `Code modification blocked: ${blockingReasons.join("; ")}`,
       "warn"
     )
@@ -118,7 +130,7 @@ export function runCodeModificationGateway(
 
   // 全部检查通过
   log(
-    "Gateway",
+    LOG_COMPONENT.GATEWAY,
     `Code modification gateway passed: ${agentName}, risk=${riskLevel}, menxia=${requiresMenxiaReview ? "required" : "not required"}`
   )
 
@@ -129,4 +141,25 @@ export function runCodeModificationGateway(
     blockingReasons: [],
     requiredActions: []
   }
+}
+
+/**
+ * 向后兼容包装函数
+ *
+ * 旧 API（5 个参数）仍然可用，会自动转换为新 API
+ */
+export function runCodeModificationGatewayLegacy(
+  sessionId: string,
+  agentName: string,
+  operation: string,
+  filesAffected: string[],
+  linesChanged: number
+): GatewayResult {
+  return runCodeModificationGateway({
+    sessionId,
+    agentName,
+    operation,
+    filesAffected,
+    linesChanged
+  })
 }

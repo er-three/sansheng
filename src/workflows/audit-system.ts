@@ -7,6 +7,7 @@
 
 import * as path from "path"
 import { log, writeFile, readFile, safeJsonParse, ensureDirExists, findRoot, generateId } from "../utils.js"
+import { LOG_COMPONENT, OPERATION_RESULT, RISK_LEVEL, PATHS } from "../constants/index.js"
 
 /**
  * 审计记录结构
@@ -42,7 +43,7 @@ interface AuditHistory {
  * 获取审计文件路径
  */
 function getAuditFilePath(root: string, sessionId: string): string {
-  return path.join(root, ".opencode", "audit", `${sessionId}.json`)
+  return path.join(root, PATHS.AUDIT_DIR, `${sessionId}.json`)
 }
 
 /**
@@ -86,14 +87,14 @@ export function appendAuditRecord(
     // 写入文件
     const success = writeFile(auditPath, JSON.stringify(history, null, 2))
     if (!success) {
-      log("AuditSystem", `Failed to write audit record to ${auditPath}`, "warn")
+      log(LOG_COMPONENT.AUDIT_SYSTEM, `Failed to write audit record to ${auditPath}`, "warn")
     } else {
-      log("AuditSystem", `Audit record appended: ${newRecord.id} (${record.result})`)
+      log(LOG_COMPONENT.AUDIT_SYSTEM, `Audit record appended: ${newRecord.id} (${record.result})`)
     }
 
     return newRecord
   } catch (error) {
-    log("AuditSystem", `Error appending audit record: ${error}`, "error")
+    log(LOG_COMPONENT.AUDIT_SYSTEM, `Error appending audit record: ${error}`, "error")
     throw error
   }
 }
@@ -119,7 +120,7 @@ export function getAuditHistory(root: string, sessionId: string): AuditRecord[] 
 
     return history.records
   } catch (error) {
-    log("AuditSystem", `Error reading audit history: ${error}`, "warn")
+    log(LOG_COMPONENT.AUDIT_SYSTEM, `Error reading audit history: ${error}`, "warn")
     return []
   }
 }
@@ -190,7 +191,7 @@ export function generateAuditReport(root: string, sessionId: string): string {
 
     return [...summaryLines, ...recordLines].join("\n")
   } catch (error) {
-    log("AuditSystem", `Error generating audit report: ${error}`, "error")
+    log(LOG_COMPONENT.AUDIT_SYSTEM, `Error generating audit report: ${error}`, "error")
     return `Error generating report: ${error}`
   }
 }
@@ -209,9 +210,9 @@ export function clearAuditHistory(root: string, sessionId: string): void {
     }, null, 2))
 
     if (success) {
-      log("AuditSystem", `Cleared audit history for session ${sessionId}`)
+      log(LOG_COMPONENT.AUDIT_SYSTEM, `Cleared audit history for session ${sessionId}`)
     }
   } catch (error) {
-    log("AuditSystem", `Error clearing audit history: ${error}`, "warn")
+    log(LOG_COMPONENT.AUDIT_SYSTEM, `Error clearing audit history: ${error}`, "warn")
   }
 }

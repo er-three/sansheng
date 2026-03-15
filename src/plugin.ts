@@ -507,14 +507,14 @@ export async function toolExecuteAfterHook(input: Record<string, unknown>, outpu
         ? ((input as any).args.new_string || "").split("\n").length
         : 0
 
-      // Phase 3：使用网关进行多层验证
-      const gatewayResult = runCodeModificationGateway(
+      // Phase 3：使用网关进行多层验证（新 API：使用请求对象）
+      const gatewayResult = runCodeModificationGateway({
         sessionId,
         agentName,
-        skillName,
+        operation: skillName,
         filesAffected,
         linesChanged
-      )
+      })
 
       // 追加审计记录（无论允许或拒绝都记录）
       appendAuditRecord(root, sessionId, {
