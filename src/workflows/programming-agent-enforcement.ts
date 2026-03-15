@@ -280,3 +280,28 @@ export function clearModificationRecords(sessionId: string): void {
   modificationRecords.delete(sessionId)
   log("ProgrammingAgent", `清空修改记录: ${sessionId}`)
 }
+
+/**
+ * 获取内存使用统计
+ *
+ * 用于监控和调试
+ */
+export function getMemoryStats(): {
+  totalSessions: number
+  totalRecords: number
+  averageRecordsPerSession: number
+} {
+  let totalRecords = 0
+  for (const records of modificationRecords.values()) {
+    totalRecords += records.length
+  }
+
+  const totalSessions = modificationRecords.size
+  const averageRecordsPerSession = totalSessions > 0 ? totalRecords / totalSessions : 0
+
+  return {
+    totalSessions,
+    totalRecords,
+    averageRecordsPerSession,
+  }
+}

@@ -115,3 +115,31 @@ export function getTestBlockingReason(sessionId: string): string | null {
     `Fix the failing tests before making new modifications.`
   )
 }
+
+/**
+ * 获取所有会话的测试状态
+ *
+ * 用于监控和清理
+ */
+export function getAllTestStatuses(): Array<{ sessionId: string; status: TestEnforcementRecord }> {
+  const result: Array<{ sessionId: string; status: TestEnforcementRecord }> = []
+  for (const [sessionId, status] of testStatusMap.entries()) {
+    result.push({ sessionId, status })
+  }
+  return result
+}
+
+/**
+ * 检查会话是否需要清理（超时清理）
+ *
+ * @param sessionId - 会话 ID
+ * @param maxAgeMs - 最大年龄（毫秒），默认 1 小时
+ * @returns 是否应该清理
+ */
+export function shouldCleanupTestStatus(sessionId: string, maxAgeMs: number = 3600000): boolean {
+  const status = testStatusMap.get(sessionId)
+  if (!status) return false
+
+  const ageMs = Date.now() - status.declaredAt.getTime()
+  return ageMs > maxAgeMs
+}
