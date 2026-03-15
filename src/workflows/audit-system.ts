@@ -6,7 +6,7 @@
  */
 
 import * as path from "path"
-import { log, writeFile, readFile, safeJsonParse, ensureDirExists, findRoot } from "../utils.js"
+import { log, writeFile, readFile, safeJsonParse, ensureDirExists, findRoot, generateId } from "../utils.js"
 
 /**
  * 审计记录结构
@@ -36,13 +36,6 @@ interface AuditHistory {
   sessionId: string
   createdAt: string
   records: AuditRecord[]
-}
-
-/**
- * 生成唯一ID（简单的UUID替代）
- */
-function generateId(): string {
-  return `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
 }
 
 /**
@@ -83,7 +76,7 @@ export function appendAuditRecord(
     // 创建新记录
     const newRecord: AuditRecord = {
       ...record,
-      id: generateId(),
+      id: generateId('audit'),
       timestamp: new Date().toISOString()
     }
 
@@ -142,45 +135,60 @@ export function generateAuditReport(root: string, sessionId: string): string {
       return `# Audit Report for Session ${sessionId}\n\nNo audit records found.`
     }
 
-    const blockedCount = records.filter(r => r.result === "blocked").length
-    const allowedCount = records.filter(r => r.result === "allowed").length
-    const highRiskCount = records.filter(r => r.riskLevel === "high").length
+    // 单次遍历收集统计数据和生成报告行
+    const reportLines: string[] = []
+    const stats = { blocked: 0, allowed: 0, highRisk: 0 }
 
-    const reportLines = [
+    records.forEach((record, index) => {
+      // 统计
+      if (record.result === "blocked") stats.blocked++
+      if (record.result === "allowed") stats.allowed++
+      if (record.riskLevel === "high") stats.highRisk++
+
+      // 生成报告行（但暂存，等先输出摘要）
+      reportLines.push(JSON.stringify({
+        index: index + 1,
+        record
+      }))
+    })
+
+    const summaryLines = [
       `# Audit Report for Session ${sessionId}`,
       "",
       "## Summary",
       `- **Total Records**: ${records.length}`,
-      `- **Allowed**: ${allowedCount}`,
-      `- **Blocked**: ${blockedCount}`,
-      `- **High Risk**: ${highRiskCount}`,
+      `- **Allowed**: ${stats.allowed}`,
+      `- **Blocked**: ${stats.blocked}`,
+      `- **High Risk**: ${stats.highRisk}`,
       "",
       "## Records",
       ""
     ]
 
+    // 格式化每条记录
+    const recordLines: string[] = []
     records.forEach((record, index) => {
-      reportLines.push(`### Record ${index + 1}`)
-      reportLines.push(`- **ID**: ${record.id}`)
-      reportLines.push(`- **Timestamp**: ${record.timestamp}`)
-      reportLines.push(`- **Agent**: ${record.agentName}`)
-      reportLines.push(`- **Operation**: ${record.operation}`)
-      reportLines.push(`- **Task**: ${record.taskId}`)
-      reportLines.push(`- **Files**: ${record.filesAffected.length} file(s)`)
-      reportLines.push(`- **Lines Changed**: ${record.linesChanged}`)
-      reportLines.push(`- **Risk Level**: ${record.riskLevel}`)
-      reportLines.push(`- **Menxia Reviewed**: ${record.menxiaReviewed ? "Yes" : "No"}`)
-      reportLines.push(`- **Tests Passed**: ${record.testsPassed ? "Yes" : "No"}`)
-      reportLines.push(`- **Result**: ${record.result.toUpperCase()}`)
+      recordLines.push(`### Record ${index + 1}`)
+      recordLines.push(`- **ID**: ${record.id}`)
+      recordLines.push(`- **Timestamp**: ${record.timestamp}`)
+      recordLines.push(`- **Agent**: ${record.agentName}`)
+      recordLines.push(`- **Operation**: ${record.operation}`)
+      recordLines.push(`- **Task**: ${record.taskId}`)
+      recordLines.push(`- **Files**: ${record.filesAffected.length} file(s)`)
+      recordLines.push(`- **Lines Changed**: ${record.linesChanged}`)
+      recordLines.push(`- **Risk Level**: ${record.riskLevel}`)
+      recordLines.push(`- **Menxia Reviewed**: ${record.menxiaReviewed ? "Yes" : "No"}`)
+      recordLines.push(`- **Tests Passed**: ${record.testsPassed ? "Yes" : "No"}`)
+      recordLines.push(`- **Result**: ${record.result.toUpperCase()}`)
 
       if (record.blockReason) {
-        reportLines.push(`- **Block Reason**: ${record.blockReason}`)
+        recordLines.push(`- **Block Reason**: ${record.blockReason}`)
       }
 
-      reportLines.push("")
+      recordLines.push("")
     })
 
-    return reportLines.join("\n")
+    return [...summaryLines, ...recordLines].join("\n")
   } catch (error) {
     log("AuditSystem", `Error generating audit report: ${error}`, "error")
     return `Error generating report: ${error}`

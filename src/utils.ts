@@ -32,12 +32,14 @@ export function ensureDirExists(dirPath: string): void {
 
 /**
  * 读取文件内容
+ *
+ * 注：直接读取，捕获异常（避免 TOCTOU 竞态条件）
  */
 export function readFile(filePath: string): string | null {
   try {
-    if (!fs.existsSync(filePath)) return null
     return fs.readFileSync(filePath, "utf-8")
   } catch (error) {
+    // 文件不存在或读取失败，都返回 null
     return null
   }
 }
@@ -71,6 +73,56 @@ export function getFileHash(filePath: string): string | null {
   } catch (error) {
     return null
   }
+}
+
+/**
+ * 生成唯一ID（支持前缀）
+ *
+ * @param prefix - ID 前缀（默认为 'id'）
+ * @returns 唯一 ID 字符串
+ *
+ * @example
+ * generateId('audit')   // 'audit-1710556800000-abc123'
+ * generateId('task')    // 'task-1710556800000-def456'
+ */
+export function generateId(prefix: string = 'id'): string {
+  const timestamp = Date.now()
+  const random = Math.random().toString(36).substring(2, 9)
+  return `${prefix}-${timestamp}-${random}`
+}
+
+/**
+ * 获取错误消息（统一处理）
+ *
+ * @param error - 任何类型的错误对象
+ * @returns 错误消息字符串
+ */
+export function getErrorMessage(error: any): string {
+  if (error instanceof Error) {
+    return error.message
+  }
+  if (typeof error === 'string') {
+    return error
+  }
+  return String(error)
+}
+
+/**
+ * 统一的日志错误处理
+ *
+ * @param category - 日志分类
+ * @param message - 日志消息
+ * @param error - 错误对象
+ * @param level - 日志级别
+ */
+export function logError(
+  category: string,
+  message: string,
+  error: any,
+  level: 'warn' | 'error' = 'error'
+): void {
+  const errorMsg = getErrorMessage(error)
+  log(category, `${message}: ${errorMsg}`, level)
 }
 
 /**
