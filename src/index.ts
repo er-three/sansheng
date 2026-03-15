@@ -10,8 +10,13 @@ import { bingbuAgent } from "./agents/bingbuAgent.js"
 import { xingbuAgent } from "./agents/xingbuAgent.js"
 import { gongbuAgent } from "./agents/gongbuAgent.js"
 import { sessionCreatedHook, sessionUpdatedHook, toolExecuteAfterHook } from "./plugin.js"
+import { setOpencodeClient } from "./utils.js"
 
 export const SanshengLiubuPlugin: Plugin = async (input: any) => {
+  // 初始化 OpenCode client（用于官方日志 API）
+  if (input && input.client) {
+    setOpencodeClient(input.client)
+  }
   return {
     async config(config: any) {
       if (!config.agent) {

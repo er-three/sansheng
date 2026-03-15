@@ -111,21 +111,72 @@ export function formatConstraints(constraints: any[]): string {
 }
 
 /**
- * 记录日志（可扩展）
+ * 全局 OpenCode client 存储
+ * 由 Plugin 在初始化时设置
  */
-export function log(category: string, message: string, level: "info" | "warn" | "error" = "info"): void {
+let opencodeClient: any = null
+
+export function setOpencodeClient(client: any): void {
+  opencodeClient = client
+}
+
+/**
+ * 内部异步日志实现
+ */
+async function logAsync(
+  category: string,
+  message: string,
+  level: "debug" | "info" | "warn" | "error"
+): Promise<void> {
+  // 如果有 OpenCode client，使用官方 API
+  if (opencodeClient && opencodeClient.app && opencodeClient.app.log) {
+    try {
+      await opencodeClient.app.log({
+        service: "@deep-flux/liubu",
+        level,
+        message: `[${category}] ${message}`,
+        extra: { category },
+      })
+      return
+    } catch (error) {
+      // 如果 API 调用失败，降级到 console 输出
+      console.error("Failed to call client.app.log():", error)
+    }
+  }
+
+  // 降级方案：输出到 console.error（更可靠地显示在 CLI 中）
   const timestamp = new Date().toISOString()
   const prefix = `[${timestamp}] [${category}]`
 
   switch (level) {
+    case "debug":
     case "info":
-      console.log(`${prefix} ${message}`)
+      console.error(`${prefix} ℹ️  ${message}`)
       break
     case "warn":
-      console.warn(`${prefix} ⚠️  ${message}`)
+      console.error(`${prefix} ⚠️  ${message}`)
       break
     case "error":
       console.error(`${prefix} ❌ ${message}`)
       break
   }
+}
+
+/**
+ * 记录日志到 OpenCode
+ * 支持同步和异步调用
+ * - 同步用法（旧代码兼容）: log(category, message)
+ * - 异步用法（推荐）: await log(category, message)
+ */
+export function log(
+  category: string,
+  message: string,
+  level: "debug" | "info" | "warn" | "error" = "info"
+): Promise<void> {
+  // 返回 Promise，异步执行日志，但不阻塞当前代码
+  // 这样旧代码 log(...) 可以继续工作，新代码可以 await log(...)
+  return logAsync(category, message, level).catch((error) => {
+    // 静默处理错误，避免影响主流程
+    console.error("Logging error:", error)
+  })
 }
