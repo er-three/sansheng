@@ -173,3 +173,105 @@ export interface RecipeContext {
   description: string
   selectedAt: number
 }
+
+// ─────────────────── 验证结果 ───────────────────
+
+export interface ValidationResult {
+  valid: boolean
+  errors: string[]
+  warnings: string[]
+  data?: any
+}
+
+// ─────────────────── 新架构类型 (Phase 4+) ───────────────────
+
+/**
+ * 工作流定义 - 用户提交的工作流
+ */
+export interface WorkflowDefinition {
+  sessionId: string
+  intent: string
+  domain?: string
+  variables?: Record<string, any>
+  recipe?: WorkflowRecipeDefinition
+  metadata?: Record<string, any>
+}
+
+/**
+ * 工作流 Recipe 定义（新架构）
+ */
+export interface WorkflowRecipeDefinition {
+  name: string
+  version: string
+  description?: string
+  steps: RecipeStepDefinition[]
+  parallel?: boolean
+  timeout?: number
+}
+
+/**
+ * Recipe 步骤定义
+ */
+export interface RecipeStepDefinition {
+  id: string
+  name: string
+  agent: string
+  dependencies?: string[]
+  parallel?: boolean
+  retryable?: boolean
+  input?: Record<string, any>
+  condition?: string
+}
+
+/**
+ * 工作流执行结果
+ */
+export interface WorkflowExecutionResult {
+  success: boolean
+  status: 'pending' | 'running' | 'paused' | 'completed' | 'failed' | 'rolled_back'
+  output: Record<string, any>
+  errors: string[]
+  warnings: string[]
+  duration: number
+  taskResults: TaskExecutionResult[]
+}
+
+/**
+ * 任务执行结果
+ */
+export interface TaskExecutionResult {
+  taskId: string
+  taskName: string
+  agent: string
+  status: 'completed' | 'failed' | 'skipped' | 'retried'
+  output: any
+  error?: string
+  duration: number
+  retryCount: number
+  startTime: number
+  endTime: number
+}
+
+/**
+ * Agent 注册信息
+ */
+export interface AgentRegistration {
+  agentName: string
+  isOnline: boolean
+  lastSeen: number
+  capabilities: string[]
+}
+
+/**
+ * 工作流事件
+ */
+export interface WorkflowEvent {
+  id: string
+  type: string
+  sessionId: string
+  timestamp: number
+  taskId?: string
+  agentName?: string
+  data: Record<string, any>
+  error?: string
+}
