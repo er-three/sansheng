@@ -28,6 +28,7 @@ import {
   listDomainRecipes,
   isDomainRecipeValid
 } from "./workflows/domain-recipes.js"
+import { analyzeRequirement, generateAnalysisReport } from "./workflows/requirement-analyzer.js"
 import { WorkflowTask } from "./types.js"
 
 export const SanshengLiubuPlugin: Plugin = async (input: any) => {
@@ -213,6 +214,54 @@ All agents are ready for coordination!
 
 使用 @getTaskQueue 查看下一步任务。
 `.trim()
+        }
+      }),
+
+      analyzeRequirement: tool({
+        description:
+          "Analyze requirement and recommend recipe - 分析需求并推荐配方。用法：说明你的需求，系统自动分析",
+        args: {},
+        async execute(input: any) {
+          // 获取上下文中用户的最新消息作为输入
+          const userInput = (globalThis as any).__lastUserInput__ ||
+                           (input && typeof input === "string" ? input : "")
+
+          if (!userInput || userInput.trim().length === 0) {
+            return `
+[INFO] 需求分析工具使用示例
+
+在你的消息中描述需求，系统会自动分析：
+
+✅ 修复一个认证模块的 bug
+✅ 迁移一个 Ionic 应用到 React
+✅ 重构整个 Agent 系统架构
+✅ 线上支付模块的紧急修复
+✅ 提取一个简单前端项目的资产
+
+系统会推荐最合适的工作流配方、复杂度、风险等级和成本预测。
+`.trim()
+          }
+
+          try {
+            const analysis = analyzeRequirement(userInput)
+            const report = generateAnalysisReport(analysis)
+
+            const domainName = {
+              "general": "General",
+              "cr-processing": "CRProcessing",
+              "asset-management": "AssetManagement",
+              "reverse-engineering": "ReverseEngineering"
+            }[analysis.domain] || "General"
+
+            return `
+${report}
+
+[下一步]
+使用 @init${domainName}Workflow 启动工作流，然后选择 ${analysis.recipeName} 配方
+`.trim()
+          } catch (error) {
+            return `[ERROR] 分析失败: ${error}`
+          }
         }
       }),
 
