@@ -275,11 +275,30 @@ export function getQueueStats(sessionId: string): {
     return { total: 0, pending: 0, inProgress: 0, completed: 0, failed: 0 }
   }
 
+  // 单次遍历计算所有状态（性能优化：O(N) 而非 O(4N)）
+  const stats = { pending: 0, inProgress: 0, completed: 0, failed: 0 }
+  for (const task of queue.tasks) {
+    switch (task.status) {
+      case "pending":
+        stats.pending++
+        break
+      case "in_progress":
+        stats.inProgress++
+        break
+      case "done":
+        stats.completed++
+        break
+      case "failed":
+        stats.failed++
+        break
+    }
+  }
+
   return {
     total: queue.tasks.length,
-    pending: queue.tasks.filter(t => t.status === "pending").length,
-    inProgress: queue.tasks.filter(t => t.status === "in_progress").length,
-    completed: queue.tasks.filter(t => t.status === "done").length,
-    failed: queue.tasks.filter(t => t.status === "failed").length
+    pending: stats.pending,
+    inProgress: stats.inProgress,
+    completed: stats.completed,
+    failed: stats.failed
   }
 }

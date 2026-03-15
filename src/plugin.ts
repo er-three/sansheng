@@ -89,7 +89,13 @@ let cleanupTimer: NodeJS.Timer | null = null
 // Phase 4: 配置管理器（全局单例）
 let configManager: ConfigManager | null = null
 
+// 防止重复初始化（线程安全）
+let isInitialized = false
+
 function initializePlugin(context?: PluginContext): void {
+  // 已初始化，直接返回（防止重复初始化和竞态条件）
+  if (isInitialized) return
+
   // 注册 OpenCode 客户端用于日志集成
   if (context) {
     setOpencodeClient(context)
@@ -106,6 +112,8 @@ function initializePlugin(context?: PluginContext): void {
     configManager = createConfigManager(root, context)
     log("Plugin", "Initialized configuration manager with Phase 4 support")
   }
+
+  isInitialized = true
 }
 
 // ─────────────────── Plugin 工厂函数 ───────────────────

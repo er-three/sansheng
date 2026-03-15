@@ -241,7 +241,7 @@ export function log(
  *
  * @param taskId 任务 ID
  * @param completedTasks 已完成任务数组
- * @param completedTasksSet 已完成任务 Set（可选，用于性能优化）
+ * @param completedTasksSet 已完成任务 Set（用于性能优化）
  * @returns 任务是否完成
  */
 export function isTaskCompleted(
@@ -254,19 +254,19 @@ export function isTaskCompleted(
     return completedTasksSet.has(taskId)
   }
 
-  // 否则使用数组（O(N)），但这很少发生
+  // 否则使用数组（O(N)）- 仅作为后备方案
   return completedTasks.includes(taskId)
 }
 
 /**
- * 确保 Set 缓存同步
+ * 确保 Set 缓存同步 - 类型安全版本
  *
  * 当向 completedTasks 数组添加项时，调用此函数同步 Set 缓存
  *
- * @param queue 任务队列
+ * @param queue 任务队列对象
  * @param taskId 新完成的任务 ID
  */
-export function syncCompletedTasksSet(queue: any, taskId: string): void {
+export function syncCompletedTasksSet(queue: { completedTasks: string[]; completedTasksSet?: Set<string> }, taskId: string): void {
   if (!queue.completedTasksSet) {
     queue.completedTasksSet = new Set(queue.completedTasks)
   }

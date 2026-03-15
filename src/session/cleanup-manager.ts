@@ -82,9 +82,7 @@ export function cleanupExpiredSessions(maxAgeMs: number = CONFIG.SESSION_EXPIRAT
     }
 
     // 检查孤立的修改记录（对应的会话已删除但数据还在）
-    const orphanedSessions = new Set<string>()
-    const activeSessions2 = getAllActiveSessions()
-    const activeSessionIds = new Set(activeSessions2.map(s => s.sessionId))
+    const activeSessionIds = new Set(activeSessions.map(s => s.sessionId))
 
     const memStats = getMemoryStats()
     if (memStats.totalSessions > activeSessionIds.size) {

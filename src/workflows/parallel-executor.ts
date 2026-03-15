@@ -2,7 +2,7 @@
  * 并行执行管理器 - Phase 4
  */
 
-import { log } from "../utils.js"
+import { log, isTaskCompleted } from "../utils.js"
 import { WorkflowTask } from "../types.js"
 import { getTaskQueue } from "../session/task-queue.js"
 
@@ -42,7 +42,8 @@ export function getReadyTasks(sessionId: string): WorkflowTask[] {
 
   return queue.tasks.filter(t => {
     if (t.status !== "pending") return false
-    const depsCompleted = t.dependencies.every(d => queue.completedTasks.includes(d))
+    // 使用 Set 缓存优化依赖检查（O(1) 而非 O(N)）
+    const depsCompleted = t.dependencies.every(d => isTaskCompleted(d, queue.completedTasks, queue.completedTasksSet))
     return depsCompleted
   })
 }
