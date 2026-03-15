@@ -128,3 +128,48 @@ export interface GlobalConstraints {
   parallel_execution?: Array<{ name: string; content: string; priority: string }>
   [key: string]: any
 }
+
+// ─────────────────── 任务队列系统 ───────────────────
+
+export interface WorkflowTask {
+  id: string
+  name: string
+  agent: string
+  description: string
+  status: "pending" | "claimed" | "in_progress" | "done" | "failed"
+  claimedBy?: string
+  claimedAt?: number
+  completedAt?: number
+  dependencies: string[]
+  outputs?: Record<string, any>
+  error?: string
+}
+
+export interface TaskQueue {
+  sessionId: string
+  tasks: WorkflowTask[]
+  currentTask: string | null
+  completedTasks: string[]
+  recipeType: "simple" | "medium" | "complex" | "high_risk"
+  createdAt: number
+  updatedAt: number
+}
+
+// ─────────────────── 流程配方系统 ───────────────────
+
+export interface WorkflowRecipe {
+  id: string
+  name: string
+  description: string
+  steps: string[]
+  canParallel?: string[][]
+  criticalPath: string[]
+  taskType: "simple" | "medium" | "complex" | "high_risk"
+}
+
+export interface RecipeContext {
+  recipeId: string
+  taskType: string
+  description: string
+  selectedAt: number
+}

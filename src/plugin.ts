@@ -44,6 +44,15 @@ import {
 import { createConfigManager, ConfigManager } from "./config/manager.js"
 import { getConstraintInjectionProfile, estimateSavingsPercentage } from "./config/constraint-profile.js"
 import { formatConstraints, findRoot, log } from "./utils.js"
+import {
+  getTaskQueue,
+  claimTask,
+  completeTask,
+  failTask,
+  canStartTask,
+  getCriticalPathStatus
+} from "./session/task-queue.js"
+import { getRecipe, validateRecipeCompliance } from "./workflows/recipes.js"
 
 // ─────────────────── Plugin 初始化 ───────────────────
 
@@ -308,7 +317,7 @@ export async function sessionUpdatedHook(input: Record<string, unknown>, context
 }
 
 /**
- * Tool Execute After Hook - 跟踪工具执行
+ * Tool Execute After Hook - 跟踪工具执行和任务队列验证
  */
 export async function toolExecuteAfterHook(input: Record<string, unknown>, output: { output: string }, context?: PluginContext) {
   try {
@@ -330,8 +339,65 @@ export async function toolExecuteAfterHook(input: Record<string, unknown>, outpu
     const step = domain.pipeline.find((s) => s.skill === skillName || s.id === skillName)
     if (!step) return
 
+    // ─────────────────── Phase 1：任务队列验证 ───────────────────
+
+    const sessionId = (input as any).sessionId || (input as any).session_id || "default"
+    const agentName = (input as any).agent_name || "unknown"
+
+    // 获取任务队列
+    const queue = getTaskQueue(sessionId)
+    if (queue) {
+      // 检查 1: 是否声明了任务？
+      const taskId = (input as any).task_id
+      if (!taskId) {
+        throw new Error(
+          `[PROTOCOL ERROR] Agent ${agentName} 执行了工具 ${skillName} 但没有声明任务 ID。\n` +
+          `必须先声明要做什么任务。\n\n` +
+          `正确步骤：\n` +
+          `1. 调用 @claim_task 声明任务\n` +
+          `2. 执行工作\n` +
+          `3. 调用 @complete_task 标记完成`
+        )
+      }
+
+      // 检查 2: 任务是否存在？
+      const task = queue.tasks.find(t => t.id === taskId)
+      if (!task) {
+        throw new Error(
+          `[TASK NOT FOUND] 任务 ${taskId} 不存在。\n` +
+          `请使用有效的任务 ID。`
+        )
+      }
+
+      // 检查 3: 任务的依赖是否都完成了？
+      const incompleteDeps = task.dependencies.filter(
+        dep => !queue.completedTasks.includes(dep)
+      )
+      if (incompleteDeps.length > 0) {
+        const incompleteNames = incompleteDeps
+          .map(dep => queue.tasks.find(t => t.id === dep)?.name)
+          .filter(Boolean)
+          .join(", ")
+        throw new Error(
+          `[DEPENDENCY ERROR] 任务 "${task.name}" 的前置依赖未完成：\n` +
+          `  - ${incompleteNames}\n\n` +
+          `必须先完成这些任务。`
+        )
+      }
+
+      // 检查 4: 验证配方合规性（关键路径）
+      const recipe = getRecipe(queue.recipeType)
+      const compliance = validateRecipeCompliance(recipe, queue.tasks, queue.completedTasks)
+      if (!compliance.compliant) {
+        log("Workflow", `Recipe compliance violations:\n${compliance.violations.join("\n")}`, "warn")
+      }
+
+      log("TaskQueue", `Tool executed: ${skillName} for task ${taskId} by ${agentName}`)
+    }
+
     log("Pipeline", `Tool executed: ${skillName}`)
   } catch (error) {
     log("Plugin", `Error in tool execute hook: ${error}`, "warn")
+    throw error
   }
 }
