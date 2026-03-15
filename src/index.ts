@@ -22,6 +22,12 @@ import {
   getQueueStats
 } from "./session/task-queue.js"
 import { getRecipe, generateRecipeProgress, listAllRecipes } from "./workflows/recipes.js"
+import {
+  getDomainRecipes,
+  getDomainRecipe,
+  listDomainRecipes,
+  isDomainRecipeValid
+} from "./workflows/domain-recipes.js"
 import { WorkflowTask } from "./types.js"
 
 export const SanshengLiubuPlugin: Plugin = async (input: any) => {
@@ -215,6 +221,108 @@ All agents are ready for coordination!
         args: {},
         async execute() {
           return listAllRecipes()
+        }
+      }),
+
+      listDomainRecipes: tool({
+        description:
+          "List recipes for a specific domain (asset-management or reverse-engineering) - 列出特定域的流程配方",
+        args: {},
+        async execute() {
+          return `
+Available domains with recipes:
+1. asset-management - 资产管理和提取
+   Recipes: quick (5min), standard (15min), complete (25min)
+
+2. reverse-engineering - 逆向工程和迁移
+   Recipes: frontend-only, standard, migration, full-stack, high-risk
+
+Use: @selectDomain to choose a domain and recipe.
+`.trim()
+        }
+      }),
+
+      selectDomain: tool({
+        description:
+          "Select a domain and recipe to initialize workflow - 选择域和配方初始化工作流",
+        args: {},
+        async execute() {
+          return `
+[INFO] Domain Selection
+
+选择你的工作域和配方：
+
+【资产管理（asset-management）】
+  @initAssetManagementWorkflow
+
+  快速提取：  "quick"    - 仅核心资产 (5min, ~55K token)
+  标准提取：  "standard" - 完整资产 (15min, ~125K token)
+  完整提取：  "complete" - 强化检查 (25min, ~175K token)
+
+【逆向工程（reverse-engineering）】
+  @initReverseEngineeringWorkflow
+
+  前端专用：  "frontend_only" - 展示组件 (5min, ~90K token)
+  标准迁移：  "standard"      - 完整迁移 (12min, ~135K token)
+  快速迁移：  "migration"     - 有测试项目 (10min, ~110K token)
+  完整系统：  "full_stack"    - 复杂系统 (20min, ~200K token)
+  高风险系统："high_risk"     - 关键应用 (25min, ~225K token)
+
+示例用法：
+  选择资产快速提取：
+  "我想要做资产快速提取，用 quick 模式"
+
+  选择逆向工程标准迁移：
+  "我想要做 Ionic 迁移，用标准流程"
+`.trim()
+        }
+      }),
+
+      initAssetManagementWorkflow: tool({
+        description: "Initialize asset management workflow - 初始化资产管理工作流",
+        args: {},
+        async execute() {
+          return `
+[INFO] Asset Management Workflow Initialization
+
+使用方式：
+1. 选择配方：quick / standard / complete
+2. 描述你的项目
+3. 系统会创建对应的任务队列
+
+示例：
+  "我要提取一个简单的 Angular 项目资产，用 quick 模式"
+
+系统会：
+  ✅ 初始化任务队列
+  ✅ 加载对应的约束
+  ✅ 准备 yibu, bingbu, gongbu 等 Agent
+  ✅ 开始 scan 步骤
+`.trim()
+        }
+      }),
+
+      initReverseEngineeringWorkflow: tool({
+        description: "Initialize reverse engineering workflow - 初始化逆向工程工作流",
+        args: {},
+        async execute() {
+          return `
+[INFO] Reverse Engineering Workflow Initialization
+
+使用方式：
+1. 选择配方：frontend-only / standard / migration / full-stack / high-risk
+2. 描述你的项目复杂度和需求
+3. 系统会创建对应的任务队列
+
+示例：
+  "我要迁移一个 Ionic 应用，标准流程"
+
+系统会：
+  ✅ 初始化 TDD 全流程
+  ✅ 加载 Section 2A 路径表
+  ✅ 准备 yibu, gongbu, xingbu, bingbu Agent
+  ✅ 开始 infrastructure 步骤
+`.trim()
         }
       })
     },
