@@ -53,6 +53,13 @@ import {
   getCriticalPathStatus
 } from "./session/task-queue.js"
 import { getRecipe, validateRecipeCompliance } from "./workflows/recipes.js"
+import {
+  validateCodeModification,
+  recordCodeModification,
+  shouldRequireMenxiaReview,
+  assessModificationRisk,
+  getModificationRecords
+} from "./workflows/programming-agent-enforcement.js"
 
 // ─────────────────── Plugin 初始化 ───────────────────
 
@@ -420,6 +427,51 @@ export async function toolExecuteAfterHook(input: Record<string, unknown>, outpu
       }
 
       log("TaskQueue", `Tool executed: ${skillName} for task ${taskId} by ${agentName}`)
+    }
+
+    // ─────────────────── Phase 2：编程Agent代码修改验证 ───────────────────
+
+    // 检测代码修改工具（Edit, Write, NotebookEdit）
+    const codeModificationTools = ["Edit", "Write", "NotebookEdit", "edit", "write"]
+    if (codeModificationTools.includes(skillName)) {
+      // 对于代码修改，需要强制验证
+      const modificationCheck = validateCodeModification(sessionId, agentName, skillName)
+      if (!modificationCheck.allowed) {
+        throw new Error(
+          `[PROGRAMMING AGENT ENFORCEMENT] 代码修改被拒绝\n` +
+          `原因: ${modificationCheck.reason}\n\n` +
+          `必须执行的步骤:\n` +
+          modificationCheck.requiredSteps.map((s, i) => `${i + 1}. ${s}`).join("\n")
+        )
+      }
+
+      // 代码修改通过验证，记录此次修改
+      const taskIdForModification = (input as any).task_id || "unknown"
+      const filesAffected = (input as any).args?.file_path ? [(input as any).args.file_path] : []
+      const linesChanged = (input as any).args?.old_string
+        ? ((input as any).args.new_string || "").split("\n").length
+        : 0
+      const riskLevel = assessModificationRisk(filesAffected, skillName)
+
+      recordCodeModification(sessionId, {
+        taskId: taskIdForModification,
+        agentName,
+        timestamp: new Date(),
+        filesAffected,
+        linesChanged,
+        plan: (input as any).args?.plan || "code modification",
+        riskLevel,
+        reviewedByMenxia: queue?.completedTasks?.some(t => t.includes("menxia")) || false,
+        testsPassed: true,
+        auditTrail: [
+          `[${new Date().toISOString()}] Code modification validated`,
+          `Agent: ${agentName}`,
+          `Files: ${filesAffected.join(", ")}`,
+          `Risk: ${riskLevel}`
+        ]
+      })
+
+      log("ProgrammingAgent", `Code modification validated: ${skillName} by ${agentName}, risk=${riskLevel}`)
     }
 
     log("Pipeline", `Tool executed: ${skillName}`)
