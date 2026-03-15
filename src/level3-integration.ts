@@ -8,7 +8,7 @@
  * - 返回聚合的执行报告
  */
 
-import { executeGongbuLevel3, GongbuParallelResult } from "./gongbu-level3-parallel"
+import { executeGongbuLevel3, GongbuParallelResult } from "./gongbu-level3-parallel.js"
 
 // ─────────────────── 类型定义 ───────────────────
 

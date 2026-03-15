@@ -1,6 +1,7 @@
 {
   "name": "@deep-flux/liubu",
   "version": "1.0.0-beta.1",
+  "type": "module",
   "description": "三省六部制 OpenCode Plugin - 完整的多智能体协作框架，包含皇帝（战略决策）、三省（规划审核执行）、六部（具体实现）的分层架构",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -19,15 +20,21 @@
     "type": "git",
     "url": "https://github.com/yourusername/sansheng-liubu"
   },
+  "bin": {
+    "@deep-flux/liubu": "./bin/cli.cjs"
+  },
   "files": [
     "dist",
+    "bin",
     ".opencode",
     "package.json",
-    "README.md",
-    "LICENSE"
+    "README.md"
   ],
   "scripts": {
     "build": "tsc",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
     "prepublishOnly": "npm run build",
     "clean": "rm -rf dist"
   },
@@ -35,11 +42,16 @@
     "node": ">=16.0.0"
   },
   "peerDependencies": {
-    "@opencode-ai/sdk": "^1.2.0"
+    "@opencode-ai/plugin": "*",
+    "@opencode-ai/sdk": "*"
   },
   "devDependencies": {
-    "@opencode-ai/sdk": "^1.2.24",
+    "@opencode-ai/plugin": "latest",
+    "@opencode-ai/sdk": "1.2.26",
+    "@types/jest": "^29.5.11",
     "@types/node": "^20.19.37",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.1.1",
     "typescript": "^5.9.3"
   }
 }

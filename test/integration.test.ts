@@ -8,9 +8,12 @@
  * - 全局约束注入：所有 Agent 自动获得对应约束
  */
 
-import * as assert from "assert"
+import assert from "assert"
 import { executeGongbuLevel3 } from "../src/gongbu-level3-parallel"
-import sanshengLiubuPlugin from "../src/plugin"
+import { createPlugin } from "../src/plugin"
+
+// 创建 Plugin 实例用于测试
+const sanshengLiubuPlugin = createPlugin()
 
 // ─────────────────── Level 1 测试：步骤串行 ───────────────────
 
@@ -38,12 +41,16 @@ describe("Level 1 Parallelism - 步骤串行", () => {
     const executionOrder: string[] = []
     const steps = ["analyze", "implement", "verify"]
 
-    for (let i = 0; i < steps.length; i++) {
-      executionOrder.push(steps[i])
-      if (i === 1) {
-        // 在第二步模拟失败
-        throw new Error("Step failed")
+    try {
+      for (let i = 0; i < steps.length; i++) {
+        executionOrder.push(steps[i])
+        if (i === 1) {
+          // 在第二步模拟失败
+          throw new Error("Step failed")
+        }
       }
+    } catch (error) {
+      // 预期失败在第二步
     }
 
     // 测试失败是否正确停止执行
@@ -299,14 +306,19 @@ describe("End-to-End Integration - 端到端集成", () => {
   })
 
   it("应该计算整体系统加速比", () => {
-    // 串行时间：每步 4min（4 个 agent 串行）+ 2min + 2min = 8min
-    const serialTime = 4 + 2 + 2
+    // 串行时间：每步 agent 串行执行
+    // analyze: yibu(2min) + hubu(1min) = 3min
+    // implement: gongbu(2min) + bingbu(1min) = 3min
+    // verify: xingbu(1min) + bingbu(1min) = 2min
+    // 总计: 3 + 3 + 2 = 8min
+    const serialTime = 3 + 3 + 2
 
     // 并行时间：每步 max(agent_time) 并行
     // analyze(yibu:2min, hubu:1min) = 2min
-    // implement(gongbu:4min, bingbu:2min) = 4min
-    // verify(xingbu:1min, bingbu:2min) = 2min
-    const parallelTime = 2 + 4 + 2
+    // implement(gongbu:2min, bingbu:1min) = 2min
+    // verify(xingbu:1min, bingbu:1min) = 1min
+    // 总计: 2 + 2 + 1 = 5min
+    const parallelTime = 2 + 2 + 1
 
     const systemSpeedup = serialTime / parallelTime
     assert(systemSpeedup > 1, "System should have positive speedup")
