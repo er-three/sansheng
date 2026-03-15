@@ -38,7 +38,7 @@ export function discoverConstraintsOptimized(
   // 根据配置的 scopes 选择性加载约束
   const scopesToLoad = new Set(profile.scopes)
 
-  // 1️⃣ 加载 UNIVERSAL 约束（必须）
+  // [STEP-1] 加载 UNIVERSAL 约束（必须）
   if (scopesToLoad.has(ConstraintScope.UNIVERSAL)) {
     const globalFile1 = path.join(constraintsDir, "global.md")
     const globalFile2 = path.join(constraintsDir, "global.yaml")
@@ -59,7 +59,7 @@ export function discoverConstraintsOptimized(
     }
   }
 
-  // 2️⃣ 加载 Agent 特化约束（如果配置要求）
+  // [STEP-2] 加载 Agent 特化约束（如果配置要求）
   const agentSpecificScopes = [
     ConstraintScope.AGENT_IMPLEMENTATION,
     ConstraintScope.AGENT_CODE_REVIEW,
@@ -89,7 +89,7 @@ export function discoverConstraintsOptimized(
     }
   }
 
-  // 3️⃣ 加载其他需要的约束
+  // [STEP-3] 加载其他需要的约束
   for (const scope of scopesToLoad) {
     if (
       ![

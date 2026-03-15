@@ -171,7 +171,7 @@ export function generateSessionReport(): string {
     ``,
     ...stats.sessions.map(
       (s) => `- **${s.sessionId}** (${s.domain}:${s.agent})
-   已注入约束: ${s.constraintsInjected ? "✅" : "❌"}
+   已注入约束: ${s.constraintsInjected ? "[OK]" : "[FAIL]"}
    年龄: ${Math.round(s.age / 1000)}s`
     ),
     ``

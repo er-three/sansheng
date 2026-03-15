@@ -11,11 +11,11 @@
  * - utils.ts: 通用工具函数
  *
  * 改进（方案B）：
- * - ✅ Phase 1：改为标准的工厂函数模式
- * - ✅ Phase 2：替换 Experimental Hook
- * - ✅ Phase 3：迁移到官方 Session API
- * - ✅ Phase 4：统一配置管理和变量替换
- * - ✅ Phase 5：导出 Hooks 供新的 Plugin 模式使用
+ * - [OK] Phase 1：改为标准的工厂函数模式
+ * - [OK] Phase 2：替换 Experimental Hook
+ * - [OK] Phase 3：迁移到官方 Session API
+ * - [OK] Phase 4：统一配置管理和变量替换
+ * - [OK] Phase 5：导出 Hooks 供新的 Plugin 模式使用
  */
 
 // OpenCode Plugin 类型
@@ -203,7 +203,7 @@ export function createPlugin(context?: PluginContext): any {
       }
     },
 
-    // ✅ Hook 3: session.compacting（稳定版）- 保留供将来使用
+    // [OK] Hook 3: session.compacting（稳定版）- 保留供将来使用
     // 注：当 OpenCode 官方的 session.compacting 稳定后，可启用此 Hook
     // "session.compacting": async (input: Record<string, unknown>, output: any) => {
     //   try {

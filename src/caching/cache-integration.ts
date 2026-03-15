@@ -293,13 +293,13 @@ export class CacheMonitoring {
     const stepStats = GlobalCacheManager.getStepResultCache().getStats()
 
     if (constraintStats.hitRate === "0.00%") {
-      lines.push("- ⚠️ 约束缓存命中率为 0%，可能需要预热")
+      lines.push("- [WARN] 约束缓存命中率为 0%，可能需要预热")
     }
     if (parseFloat(planStats.hitRate) < 30) {
-      lines.push("- ⚠️ 计划缓存命中率偏低，可能需要调整 TTL 或预热")
+      lines.push("- [WARN] 计划缓存命中率偏低，可能需要调整 TTL 或预热")
     }
     if (parseFloat(stepStats.hitRate) < 50) {
-      lines.push("- ⚠️ 步骤结果缓存命中率偏低，可能需要增加缓存大小")
+      lines.push("- [WARN] 步骤结果缓存命中率偏低，可能需要增加缓存大小")
     }
 
     lines.push("")
@@ -307,11 +307,11 @@ export class CacheMonitoring {
 
     const totalHits = constraintStats.hits + planStats.hits + stepStats.hits
     if (totalHits > 0) {
-      lines.push(`- ✅ 缓存命中 ${totalHits} 次，有效降低了 token 消耗`)
+      lines.push(`- [OK] 缓存命中 ${totalHits} 次，有效降低了 token 消耗`)
     }
 
     if (constraintStats.avgAccessCount > 5) {
-      lines.push("- ✅ 约束被频繁访问，缓存策略有效")
+      lines.push("- [OK] 约束被频繁访问，缓存策略有效")
     }
 
     return lines.join("\n")

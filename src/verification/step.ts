@@ -29,9 +29,9 @@ export function verifyStepCriteria(
           const filePath = path.join(projectRoot, criterion.path || "")
           passed = fs.existsSync(filePath)
           if (passed) {
-            passedCriteria.push(`✅ 文件存在: ${criterion.path}`)
+            passedCriteria.push(`[OK] 文件存在: ${criterion.path}`)
           } else {
-            failedCriteria.push(`❌ 文件缺失: ${criterion.path}`)
+            failedCriteria.push(`[FAIL] 文件缺失: ${criterion.path}`)
           }
         } else if (criterion.type === "file_not_empty") {
           const filePath = path.join(projectRoot, criterion.path || "")
@@ -39,12 +39,12 @@ export function verifyStepCriteria(
             const size = fs.statSync(filePath).size
             passed = size > 0
             if (passed) {
-              passedCriteria.push(`✅ 文件非空: ${criterion.path} (${size} bytes)`)
+              passedCriteria.push(`[OK] 文件非空: ${criterion.path} (${size} bytes)`)
             } else {
-              failedCriteria.push(`❌ 文件为空: ${criterion.path}`)
+              failedCriteria.push(`[FAIL] 文件为空: ${criterion.path}`)
             }
           } else {
-            failedCriteria.push(`❌ 文件缺失: ${criterion.path}`)
+            failedCriteria.push(`[FAIL] 文件缺失: ${criterion.path}`)
           }
         } else if (criterion.type === "file_size_min") {
           const filePath = path.join(projectRoot, criterion.path || "")
@@ -53,15 +53,15 @@ export function verifyStepCriteria(
             passed = size >= (criterion.bytes || 0)
             if (passed) {
               passedCriteria.push(
-                `✅ 文件大小满足: ${criterion.path} (${size} >= ${criterion.bytes} bytes)`
+                `[OK] 文件大小满足: ${criterion.path} (${size} >= ${criterion.bytes} bytes)`
               )
             } else {
               failedCriteria.push(
-                `❌ 文件过小: ${criterion.path} (${size} < ${criterion.bytes} bytes)`
+                `[FAIL] 文件过小: ${criterion.path} (${size} < ${criterion.bytes} bytes)`
               )
             }
           } else {
-            failedCriteria.push(`❌ 文件缺失: ${criterion.path}`)
+            failedCriteria.push(`[FAIL] 文件缺失: ${criterion.path}`)
           }
         } else if (criterion.type === "no_error_keywords") {
           const filePath = path.join(projectRoot, criterion.path || "")
@@ -73,23 +73,23 @@ export function verifyStepCriteria(
             passed = !hasError
             if (passed) {
               passedCriteria.push(
-                `✅ 无错误关键词: ${criterion.path} (${keywords.join(", ")})`
+                `[OK] 无错误关键词: ${criterion.path} (${keywords.join(", ")})`
               )
             } else {
               failedCriteria.push(
-                `❌ 包含错误关键词: ${criterion.path} (${keywords.join(", ")})`
+                `[FAIL] 包含错误关键词: ${criterion.path} (${keywords.join(", ")})`
               )
             }
           } else {
-            failedCriteria.push(`❌ 文件缺失: ${criterion.path}`)
+            failedCriteria.push(`[FAIL] 文件缺失: ${criterion.path}`)
           }
         } else if (criterion.type === "agent_all_done") {
           // 占位符：实际需要从并行执行状态中检查
           passed = true
-          passedCriteria.push(`✅ 所有 Agent 完成`)
+          passedCriteria.push(`[OK] 所有 Agent 完成`)
         }
       } catch (error) {
-        failedCriteria.push(`❌ 验证异常: ${(error as any).message}`)
+        failedCriteria.push(`[FAIL] 验证异常: ${(error as any).message}`)
       }
     }
   }
@@ -126,7 +126,7 @@ export function formatVerificationReport(result: StepResult): string {
   return [
     `## 步骤 ${result.step_id} 验证结果`,
     ``,
-    `状态：${result.status === "success" ? "✅ 成功" : result.status === "failed" ? "❌ 失败" : "⚠️ 部分成功"}`,
+    `状态：${result.status === "success" ? "[OK] 成功" : result.status === "failed" ? "[FAIL] 失败" : "[WARN] 部分成功"}`,
     ``,
     `**通过条件**：`,
     ...result.passed_criteria.map((c) => `  ${c}`),

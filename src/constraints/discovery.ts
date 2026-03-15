@@ -34,7 +34,7 @@ export function discoverConstraints(
   const constraints: ConstraintDefinition[] = []
   const seen = new Map<string, ConstraintDefinition>() // 去重：按 name 去重
 
-  // 1️⃣ 加载全局约束
+  // [STEP-1] 加载全局约束
   const globalFile1 = path.join(constraintsDir, "global.md")
   const globalFile2 = path.join(constraintsDir, "global.yaml")
   const globalFile = fs.existsSync(globalFile1) ? globalFile1 : globalFile2
@@ -46,7 +46,7 @@ export function discoverConstraints(
     }
   }
 
-  // 2️⃣ 加载域约束
+  // [STEP-2] 加载域约束
   // 优先级：.opencode/constraints/domains/{domain}/ > .opencode/constraints/domains/{domain}.md
   const domainDir = path.join(constraintsDir, "domains", domain)
   const domainFile1 = path.join(constraintsDir, "domains", `${domain}.md`)
@@ -89,7 +89,7 @@ export function discoverConstraints(
     }
   }
 
-  // 3️⃣ 加载 Agent 约束
+  // [STEP-3] 加载 Agent 约束
   const agentFile1 = path.join(constraintsDir, "agents", `${agentName}.md`)
   const agentFile2 = path.join(constraintsDir, "agents", `${agentName}.yaml`)
 
@@ -105,7 +105,7 @@ export function discoverConstraints(
     }
   }
 
-  // 4️⃣ 加载细粒度约束（domain + agent 组合）
+  // [STEP-4] 加载细粒度约束（domain + agent 组合）
   const specificFile1 = path.join(constraintsDir, "domains", domain, `${agentName}.md`)
   const specificFile2 = path.join(constraintsDir, "domains", domain, `${agentName}.yaml`)
 

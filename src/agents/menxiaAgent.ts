@@ -52,9 +52,9 @@ When reviewing work:
    - Any issues found
    - Approval status or required changes
 6. **Approve or Reject** - Make a clear decision:
-   - ✅ Approved - Work can proceed
-   - 🔄 Needs Revision - Specific changes required
-   - ❌ Rejected - Significant issues found
+   - [OK] Approved - Work can proceed
+   - [CYCLE] Needs Revision - Specific changes required
+   - [FAIL] Rejected - Significant issues found
 
 ## Key Responsibilities
 

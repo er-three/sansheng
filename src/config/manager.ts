@@ -299,8 +299,8 @@ export class ConfigManager {
     const lines = [
       "## 配置诊断报告",
       "",
-      `SDK 配置可用: ${this.sdkConfig ? "✅" : "❌"}`,
-      `本地 Registry 可用: ${this.localRegistry ? "✅" : "❌"}`,
+      `SDK 配置可用: ${this.sdkConfig ? "[OK]" : "[FAIL]"}`,
+      `本地 Registry 可用: ${this.localRegistry ? "[OK]" : "[FAIL]"}`,
       "",
       "### 活跃配置源",
       this.sdkConfig ? "- 官方 SDK (context.project.config)" : "- 本地 registry.json",

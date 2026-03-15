@@ -296,7 +296,7 @@ async function executeSubtask(
         subtask.duration = duration
 
         // 模拟文件修改成功
-        subtask.changes = `✅ 已修改 ${subtask.file}`
+        subtask.changes = `[OK] 已修改 ${subtask.file}`
 
         resolve()
       } catch (error) {
@@ -353,18 +353,18 @@ export async function executeGongbuLevel3(
   const startTime = Date.now()
 
   try {
-    // 1️⃣ 分析依赖关系
+    // [STEP-1] 分析依赖关系
     const dependencyGraph = buildDependencyGraph(files, projectRoot)
 
-    // 2️⃣ 构建并行执行组
+    // [STEP-2] 构建并行执行组
     const groups = buildParallelGroups(files, dependencyGraph)
 
-    // 3️⃣ 并行执行每一组
+    // [STEP-3] 并行执行每一组
     for (const group of groups) {
       await executeParallelGroup(group, projectRoot)
     }
 
-    // 4️⃣ 收集执行结果
+    // [STEP-4] 收集执行结果
     const allSubtasks: ParallelSubtask[] = []
     for (const group of groups) {
       allSubtasks.push(...group.subtasks)
@@ -375,7 +375,7 @@ export async function executeGongbuLevel3(
 
     const duration = Date.now() - startTime
 
-    // 5️⃣ 生成报告
+    // [STEP-5] 生成报告
     const result: GongbuParallelResult = {
       status: failed === 0 ? "PASS" : failed < passed ? "PARTIAL" : "FAIL",
       files_modified: allSubtasks.map((t) => t.file),
@@ -422,29 +422,29 @@ export function formatParallelReport(result: GongbuParallelResult): string {
 
   lines.push("")
   lines.push("═".repeat(70))
-  lines.push("【🚀 第 3 级并行执行报告】")
+  lines.push("【[ROCKET] 第 3 级并行执行报告】")
   lines.push("═".repeat(70))
   lines.push("")
 
   // 状态概览
   const statusEmoji =
     result.status === "PASS"
-      ? "✅"
+      ? "[OK]"
       : result.status === "FAIL"
-        ? "❌"
-        : "⚠️"
+        ? "[FAIL]"
+        : "[WARN]"
   lines.push(`${statusEmoji} 状态: ${result.status}`)
-  lines.push(`📊 总任务数: ${result.summary.total}`)
-  lines.push(`✅ 成功: ${result.summary.passed}`)
-  lines.push(`❌ 失败: ${result.summary.failed}`)
-  lines.push(`⏱️  总耗时: ${(result.total_duration / 1000).toFixed(2)}s`)
-  lines.push(`🚀 加速比: ${result.theoretical_speedup}`)
+  lines.push(`[CHART] 总任务数: ${result.summary.total}`)
+  lines.push(`[OK] 成功: ${result.summary.passed}`)
+  lines.push(`[FAIL] 失败: ${result.summary.failed}`)
+  lines.push(`[TIMER]  总耗时: ${(result.total_duration / 1000).toFixed(2)}s`)
+  lines.push(`[ROCKET] 加速比: ${result.theoretical_speedup}`)
   lines.push("")
 
   // 执行分层
   lines.push("### 执行分层")
   for (const group of result.groups) {
-    const icon = group.canParallel ? "⚡" : "▶️"
+    const icon = group.canParallel ? "[BOLT]" : "[PLAY]"
     lines.push(
       `${icon} 第 ${group.level + 1} 层（${group.subtasks.length} 个任务${group.canParallel ? "，可并行" : ""}）`
     )
@@ -454,9 +454,9 @@ export function formatParallelReport(result: GongbuParallelResult): string {
       const prefix = i === group.subtasks.length - 1 ? "└─" : "├─"
       const statusIcon =
         subtask.status === "done"
-          ? "✅"
+          ? "[OK]"
           : subtask.status === "failed"
-            ? "❌"
+            ? "[FAIL]"
             : "⏳"
       lines.push(
         `  ${prefix} ${statusIcon} ${subtask.name} (${(subtask.duration || 0) / 1000}s)`

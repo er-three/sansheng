@@ -297,7 +297,7 @@ export function generateConstraintProfileReport(): string {
       const savings = estimateSavingsPercentage(agent, domain)
 
       lines.push(
-        `| ${agent} | ${domain} | ${profile.scopes.length} | ${profile.priority} | ${profile.compress ? "✓" : "✗"} | ${savings}% |`
+        `| ${agent} | ${domain} | ${profile.scopes.length} | ${profile.priority} | ${profile.compress ? "[CHECK]" : "[CROSS]"} | ${savings}% |`
       )
     }
   }

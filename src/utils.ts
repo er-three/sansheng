@@ -151,13 +151,13 @@ async function logAsync(
   switch (level) {
     case "debug":
     case "info":
-      console.error(`${prefix} ℹ️  ${message}`)
+      console.error(`${prefix} [INFO]  ${message}`)
       break
     case "warn":
-      console.error(`${prefix} ⚠️  ${message}`)
+      console.error(`${prefix} [WARN]  ${message}`)
       break
     case "error":
-      console.error(`${prefix} ❌ ${message}`)
+      console.error(`${prefix} [FAIL] ${message}`)
       break
   }
 }

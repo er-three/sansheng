@@ -249,30 +249,30 @@ export function formatLevel3Report(response: Level3ExecutionResponse): string {
 
   lines.push("")
   lines.push("═".repeat(70))
-  lines.push("【⚡ Level 3 子任务并行执行报告】")
+  lines.push("【[BOLT] Level 3 子任务并行执行报告】")
   lines.push("═".repeat(70))
   lines.push("")
 
   // 状态概览
   const statusEmoji =
     response.status === "success"
-      ? "✅"
+      ? "[OK]"
       : response.status === "partial"
-        ? "⚠️"
-        : "❌"
+        ? "[WARN]"
+        : "[FAIL]"
   lines.push(`${statusEmoji} 状态: ${response.status.toUpperCase()}`)
-  lines.push(`📁 总文件数: ${response.summary.total_files}`)
-  lines.push(`📊 并行分组: ${response.summary.parallel_groups} 组`)
-  lines.push(`⏱️  执行耗时: ${(response.summary.execution_time_ms / 1000).toFixed(2)}s`)
-  lines.push(`🚀 加速比: ${response.summary.speedup}`)
-  lines.push(`➡️  下一步: ${response.next_step}`)
+  lines.push(`[FOLDER] 总文件数: ${response.summary.total_files}`)
+  lines.push(`[CHART] 并行分组: ${response.summary.parallel_groups} 组`)
+  lines.push(`[TIMER]  执行耗时: ${(response.summary.execution_time_ms / 1000).toFixed(2)}s`)
+  lines.push(`[ROCKET] 加速比: ${response.summary.speedup}`)
+  lines.push(`[ARROW]  下一步: ${response.next_step}`)
   lines.push("")
 
   // 执行分组详情
   if (response.level3_result.groups.length > 0) {
     lines.push("### 执行分组详情")
     for (const group of response.level3_result.groups) {
-      const icon = group.canParallel ? "⚡" : "▶️"
+      const icon = group.canParallel ? "[BOLT]" : "[PLAY]"
       lines.push(
         `${icon} 第 ${group.level + 1} 层（${group.subtasks.length} 个任务${group.canParallel ? "，可并行" : ""}）`
       )
@@ -282,9 +282,9 @@ export function formatLevel3Report(response: Level3ExecutionResponse): string {
         const prefix = i === group.subtasks.length - 1 ? "└─" : "├─"
         const statusIcon =
           subtask.status === "done"
-            ? "✅"
+            ? "[OK]"
             : subtask.status === "failed"
-              ? "❌"
+              ? "[FAIL]"
               : "⏳"
         const duration = subtask.duration
           ? `${(subtask.duration / 1000).toFixed(2)}s`
@@ -297,13 +297,13 @@ export function formatLevel3Report(response: Level3ExecutionResponse): string {
 
   // 完成/失败文件列表
   if (response.summary.files_completed.length > 0) {
-    lines.push("✅ 完成的文件:")
+    lines.push("[OK] 完成的文件:")
     response.summary.files_completed.forEach((f) => lines.push(`   - ${f}`))
     lines.push("")
   }
 
   if (response.summary.files_failed.length > 0) {
-    lines.push("❌ 失败的文件:")
+    lines.push("[FAIL] 失败的文件:")
     response.summary.files_failed.forEach((f) => lines.push(`   - ${f}`))
     lines.push("")
   }

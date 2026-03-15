@@ -60,17 +60,17 @@ export const SanshengLiubuPlugin: Plugin = async (input: any) => {
         args: {},
         async execute() {
           return `
-✨ Sansheng Liubu Plugin Status
+[SPARKLES] Sansheng Liubu Plugin Status
 
-👑 Emperor (Primary Agent):
+[EMPEROR] Emperor (Primary Agent):
   • huangdi - Strategic coordinator
 
-📋 Three Departments (Planning, Review, Execution):
+[DEPT] Three Departments (Planning, Review, Execution):
   • zhongshu (中书省) - Central Secretariat - Planning
   • menxia (门下省) - Chancellery - Review & QA
   • shangshu (尚书省) - Department of State Affairs - Execution
 
-🏛️ Six Ministries (Implementation Specialists):
+[MINISTRY] Six Ministries (Implementation Specialists):
   • libu (吏部) - Ministry of Civil Service - Code Structure
   • hubu (户部) - Ministry of Revenue - Dependencies
   • libu-rites (礼部) - Ministry of Rites - Standards

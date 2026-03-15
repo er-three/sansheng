@@ -104,7 +104,7 @@ export function generatePipelineStatus(
   const lines: string[] = []
 
   lines.push("═".repeat(60))
-  lines.push(`📊 流水线状态 (${domain.name || "未知域"})`)
+  lines.push(`[CHART] 流水线状态 (${domain.name || "未知域"})`)
   lines.push("═".repeat(60))
 
   for (let i = 0; i < pipeline.length; i++) {
@@ -117,16 +117,16 @@ export function generatePipelineStatus(
     let statusSuffix = ""
 
     if (isFailed) {
-      icon = "❌"
+      icon = "[FAIL]"
       statusSuffix = " [失败]"
     } else if (isCompleted) {
-      icon = "✅"
+      icon = "[OK]"
       statusSuffix = " [完成]"
     } else if (isCurrent) {
       icon = "⏳"
       statusSuffix = " [执行中]"
     } else if (i < (state?.completed.length || 0)) {
-      icon = "✅"
+      icon = "[OK]"
       statusSuffix = " [完成]"
     }
 

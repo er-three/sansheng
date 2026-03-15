@@ -139,8 +139,8 @@ function compressNormal(
   }
 
   // 生成摘要
-  const summary = `✅ ${successTasks.length} 个任务完成`
-    + (failedTasks.length > 0 ? `, ❌ ${failedTasks.length} 个任务失败` : "")
+  const summary = `[OK] ${successTasks.length} 个任务完成`
+    + (failedTasks.length > 0 ? `, [FAIL] ${failedTasks.length} 个任务失败` : "")
 
   log("Report", `Compressed to NORMAL: ${summary}`)
 
@@ -162,8 +162,8 @@ function compressBrief(
   const failedTasks = report.parallel_subtasks.filter((t) => t.status === "failed")
 
   const summary = baseReport.status === "success"
-    ? "✅ 全部完成"
-    : `❌ ${failedTasks.length} 个失败`
+    ? "[OK] 全部完成"
+    : `[FAIL] ${failedTasks.length} 个失败`
 
   log("Report", `Compressed to BRIEF: ${summary}`)
 
