@@ -6,6 +6,51 @@
 
 ---
 
+## [3.1.1] - 2026-03-17
+
+### 🔒 权限矩阵强制执行 (Security Hardening)
+
+**背景**：
+之前的权限配置虽然定义了 `edit: deny` 和 `bash: deny`，但缺少 `write: deny` 限制。这导致任何agent都可以通过 write 工具绕过权限检查，直接修改代码文件。大型模型（如minimax）可能利用这一漏洞直接执行所有工作，绕过三省六部的分层调度机制。
+
+### 🔐 权限强化清单
+
+#### 三省权限矩阵
+- **huangdi (皇帝)**：`edit: deny, write: deny, bash: deny` ✅
+  - 只能决策和调度，不能执行代码
+- **zhongshu (中书省)**：`edit: deny, write: deny, bash: deny` ✅
+  - 只能规划，必须通过 call_subagent 调用其他agent
+- **menxia (门下省)**：`edit: deny, write: deny, bash: deny` ✅
+  - 只能审核，必须通过 call_subagent 调用验证
+- **shangshu (尚书省)**：`edit: deny, write: deny, bash: deny, read: allow` ✅
+  - 执行协调者，只能通过 task() 调用六部，不能直接修改代码
+
+#### 六部权限矩阵
+- **吏部 (yibu)**：`edit: deny, write: deny, bash: deny, read: allow, glob: allow` ✅
+- **户部 (hubu)**：`edit: deny, write: deny, bash: deny, read: allow, glob: allow` ✅
+- **礼部 (libu)**：`edit: deny, write: deny, bash: deny, read: allow, glob: allow` ✅
+- **兵部 (bingbu)**：`edit: deny, write: deny, bash: allow` ✅
+- **刑部 (xingbu)**：`edit: deny, write: deny, bash: deny, read: allow, glob: allow` ✅
+- **工部 (gongbu)**：`edit: allow, write: allow, bash: deny, read: allow` ✅
+  - 唯一有文件修改权限的部门
+
+### ✅ 验证结果
+
+- ✅ 权限矩阵：9个agent完整覆盖，无遗漏
+- ✅ subagent调用方式：正确使用 task(agent="...") 而非 @agent 直接调用
+- ✅ 执行链路：huangdi → zhongshu/menxia/shangshu → 六部（gongbu修改）
+- ✅ 防护机制：非工部agent无法绕过write权限限制
+
+### 📝 相关文件
+
+- `.opencode/agents/huangdi.md`
+- `.opencode/agents/zhongshu.md`
+- `.opencode/agents/menxia.md`
+- `.opencode/agents/shangshu.md`
+- `.opencode/agents/{yibu,hubu,libu,bingbu,xingbu,gongbu,yushitai}.md`
+
+---
+
 ## [3.1.0] - 2026-03-17
 
 ### 🎉 治理系统完整实现 (Phase 5)
