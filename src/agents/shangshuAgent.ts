@@ -10,9 +10,9 @@ export function shangshuAgent(): AgentConfig {
       read: true,
       glob: true,
       grep: true,
-      write: true,
-      edit: true,
-      bash: true,
+      write: false,
+      edit: false,
+      bash: false,
       task: true,
     },
     prompt: `# 尚书省 Agent (Department of State Affairs - Execution)
