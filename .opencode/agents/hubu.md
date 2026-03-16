@@ -7,10 +7,14 @@ steps: 20
 permission:
   edit: deny
   bash: deny
+  read: allow
+  glob: allow
 
 allowed_tools:
   - webfetch
   - websearch
+  - read
+  - glob
   - call_subagent
 ---
 
@@ -32,7 +36,10 @@ When invoked:
 
 **Prohibited:**
 - `edit`, `write`, `bash` — No file modifications
-- `read`, `glob`, `grep` — Use only for supplementary context
+- `grep` — Use read/glob for file access, don't use grep
+
+**Limited Usage:**
+- `read`, `glob` — Only for gathering internal context to understand the codebase before research
 
 ## Output Standards
 

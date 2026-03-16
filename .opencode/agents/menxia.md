@@ -22,8 +22,42 @@ allowed_tools:
 1. 检查执行顺序是否符合 pipeline 顺序
 2. 检查每步的输入文件是否存在
 3. 检查变量是否完整
-4. 通过 → 回复"审核通过，可以执行"
-5. 不通过 → 列出具体问题，打回中书省
+4. 输出结构化 JSON 结果（见下方格式）
+
+## 输出格式
+
+审核通过时：
+```json
+{
+  "status": "APPROVED",
+  "plan_id": "计划ID",
+  "checked_items": [
+    "Pipeline顺序验证: PASS",
+    "输入文件检查: PASS",
+    "变量完整性: PASS"
+  ],
+  "notes": "计划逻辑清晰，可以执行"
+}
+```
+
+审核不通过时：
+```json
+{
+  "status": "REJECTED",
+  "plan_id": "计划ID",
+  "failed_checks": [
+    {
+      "item": "Pipeline顺序验证",
+      "reason": "步骤3的顺序与domain.yaml不符"
+    },
+    {
+      "item": "变量完整性",
+      "reason": "module_name 变量缺失"
+    }
+  ],
+  "action": "请中书省修正上述问题后重新提交"
+}
+```
 
 **注意**：执行结果的验收由御史台负责，不由门下省承担。
 

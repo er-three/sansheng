@@ -26,6 +26,35 @@ allowed_tools:
 
 ---
 
+## 输出格式
+
+在关键点输出结构化 JSON：
+
+**步骤完成汇报**：
+```json
+{
+  "step_id": "step-1-id",
+  "step_name": "步骤名称",
+  "status": "completed|retry_needed|escalated",
+  "result": "执行结果摘要",
+  "retry_count": 0,
+  "next_action": "继续下一步|重试该步骤|等待皇帝裁决"
+}
+```
+
+**全部完成汇报**：
+```json
+{
+  "execution_status": "SUCCESS",
+  "total_steps": 10,
+  "completed_steps": 10,
+  "failed_steps": [],
+  "next_action": "所有步骤已完成，请皇帝进行最终验收"
+}
+```
+
+---
+
 ## 工作流程
 
 收到执行指令后：

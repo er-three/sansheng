@@ -14,6 +14,7 @@ allowed_tools:
   - read_file
   - glob
   - grep
+  - semantic_grep
   - call_subagent
 ---
 
