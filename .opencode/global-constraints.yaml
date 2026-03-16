@@ -1,0 +1,396 @@
+# 全局约束定义
+#
+# 作用：通过 Plugin 的 experimental.chat.system.transform 钩子
+#      自动注入到所有 Agent 和 Skill 的 system prompt
+#
+# 维护：编辑此文件后，所有 Agent 下次调用时自动生效
+# 版本：1.0
+
+version: 1.0
+
+## ═══════════════════════════════════════════════════════
+## 全局通用约束（所有 Agent 必须遵守）
+## ═══════════════════════════════════════════════════════
+
+universal:
+  - name: "完整输出"
+    description: "必须展示每个步骤的完整结果，不允许省略"
+    content: "禁止省略输出，必须完整展示每个步骤的结果和中间过程"
+    priority: "high"
+
+  - name: "失败处理"
+    description: "遇到错误只重试一次，失败则报错退出"
+    content: "遇到错误只重试一次，失败则报错退出，禁止跳过失败直接进入下一步"
+    priority: "high"
+
+  - name: "代码质量"
+    description: "代码变更必须通过测试才算完成"
+    content: "代码变更必须通过测试才算完成，测试失败不得进入生产"
+    priority: "high"
+
+  - name: "落盘要求"
+    description: "生成内容必须立即落盘"
+    content: "生成内容必须立即落盘（写入文件），返回文件路径，禁止只展示在对话框"
+    priority: "high"
+
+  - name: "原样汇报"
+    description: "执行结果原样汇报"
+    content: "执行结果原样汇报，不美化不隐瞒，问题清晰陈述"
+    priority: "high"
+
+  - name: "不自行裁决"
+    description: "遇到分歧上报皇帝"
+    content: "遇到分歧或不确定之处，上报皇帝决策，不自行裁决"
+    priority: "medium"
+
+  - name: "流程尊重"
+    description: "严格遵守流水线流程"
+    content: "严格遵守流水线中定义的步骤顺序，绝不跳步"
+    priority: "high"
+
+## ═══════════════════════════════════════════════════════
+## Agent 实现类约束（gongbu 等代码生成 Agent）
+## ═══════════════════════════════════════════════════════
+
+agent_implementation:
+  - name: "完整实现"
+    description: "方法体必须完整实现"
+    content: |
+      每个方法体必须完整实现，禁止以下情况：
+      - // TODO: implement
+      - throw new NotImplementedError()
+      - 占位符注释（// placeholder）
+      - 不完整的代码块
+    priority: "high"
+
+  - name: "无省略分支"
+    description: "所有代码分支必须实现"
+    content: |
+      不允许省略任何代码分支或边界情况：
+      - if/else 的所有分支都要实现
+      - switch 语句需要 default 分支
+      - 异常情况必须处理
+    priority: "high"
+
+  - name: "类型明确"
+    description: "避免使用 any 类型"
+    content: |
+      所有类型都必须明确：
+      - 禁止使用 any（除非万不得已）
+      - 函数参数和返回值都要标注类型
+      - 字段和变量的类型都要声明
+    priority: "high"
+
+  - name: "编译验证"
+    description: "编辑前后都要验证编译"
+    content: |
+      代码编辑遵循 Hash-Anchored Edit 规范：
+      1. 编辑前使用 verify_edit_context 验证 old_string 唯一性
+      2. 编辑后验证文件仍然能够编译/解析
+      3. 验证成功后才能标记完成
+    priority: "high"
+
+## ═══════════════════════════════════════════════════════
+## Agent 审查类约束（xingbu 等代码审查 Agent）
+## ═══════════════════════════════════════════════════════
+
+agent_code_review:
+  - name: "严格审查"
+    description: "逐行检查代码质量"
+    content: |
+      进行严格的代码审查：
+      - 逐文件、逐行检查
+      - 关注代码质量、安全性、性能
+      - 发现问题要清晰列出
+    priority: "high"
+
+  - name: "严重问题必修"
+    description: "严重问题必须修复"
+    content: |
+      按问题严重程度分类：
+      - 🔴 严重问题（安全、功能错误）：必须修复
+      - 🟡 中等问题（性能、可维护性）：应该修复
+      - 🟢 建议项（风格、最佳实践）：可选
+      严重问题未修复禁止通过审查。
+    priority: "high"
+
+  - name: "风险识别"
+    description: "识别潜在风险"
+    content: |
+      重点识别以下风险：
+      - 安全漏洞（SQL 注入、XSS、CSRF）
+      - 性能问题（N+1、内存泄漏、死循环）
+      - 并发问题（竞态条件、死锁）
+      - 资源泄漏（文件、数据库连接）
+    priority: "high"
+
+## ═══════════════════════════════════════════════════════
+## Agent 验证类约束（bingbu 等测试验证 Agent）
+## ═══════════════════════════════════════════════════════
+
+agent_verification:
+  - name: "测试必过"
+    description: "所有测试必须通过"
+    content: |
+      测试执行必须全部通过：
+      - 不允许有失败的测试进入生产
+      - 不允许跳过测试
+      - 构建必须成功
+    priority: "high"
+
+  - name: "覆盖率要求"
+    description: "测试覆盖率达到要求"
+    content: |
+      代码修改必须满足测试覆盖：
+      - 新增代码的测试覆盖率应 ≥ 80%
+      - 关键路径的测试覆盖率应 ≥ 95%
+      - 不允许降低现有覆盖率
+    priority: "medium"
+
+  - name: "性能验证"
+    description: "验证性能指标"
+    content: |
+      对性能敏感的代码进行验证：
+      - 比较修改前后的性能（如果有性能目标）
+      - 检查是否有明显的性能回退
+      - 记录任何性能变化
+    priority: "medium"
+
+## ═══════════════════════════════════════════════════════
+## Skill 通用约束
+## ═══════════════════════════════════════════════════════
+
+skill_definition:
+  - name: "输入定义"
+    description: "必须定义 inputs"
+    content: |
+      每个 Skill 的 contract.yaml 必须定义 inputs：
+      - 明确列出所需的输入文件或参数
+      - 标注是否 required: true/false
+      - 说明输入的格式和来源
+    priority: "high"
+
+  - name: "输出定义"
+    description: "必须定义 outputs"
+    content: |
+      每个 Skill 的 contract.yaml 必须定义 outputs：
+      - 明确列出将生成的输出文件
+      - 说明输出的格式和位置
+      - 定义验收条件
+    priority: "high"
+
+  - name: "依赖声明"
+    description: "必须声明依赖"
+    content: |
+      如果 Skill 依赖其他 Skill，必须在 contract.yaml 中声明：
+      - depends_on: [skill1, skill2]
+      - 系统会自动验证依赖是否完成
+      - 不允许隐式依赖
+    priority: "high"
+
+  - name: "验收条件"
+    description: "必须定义验收条件"
+    content: |
+      每个 Skill 必须定义验收条件（verify 字段）：
+      - 文件检查：输出文件是否存在且完整
+      - 命令检查：关键命令是否执行成功
+      - 格式检查：输出格式是否合法
+    priority: "high"
+
+## ═══════════════════════════════════════════════════════
+## 并行执行约束
+## ═══════════════════════════════════════════════════════
+
+parallel_execution:
+  - name: "真正并行"
+    description: "多个任务必须真正并行"
+    content: |
+      并行执行不是伪并行：
+      - uses: [agent1, agent2] 必须真正同时执行
+      - 不允许依次执行（实际串行）
+      - Plugin 会自动跟踪并行状态
+    priority: "high"
+
+  - name: "子任务验证"
+    description: "所有子任务必须验证成功"
+    content: |
+      Level 3 并行中（代理内子任务）：
+      - 返回的 parallel_subtasks 数组中每个子任务都要验证
+      - status 必须是 "✅ PASS"，不允许有失败
+      - 任何子任务失败立即停止整个步骤
+    priority: "high"
+
+  - name: "失败即停"
+    description: "任何任务失败立即停止"
+    content: |
+      并行执行的失败处理：
+      - 不允许某个任务失败但继续执行其他任务
+      - 必须立即停止所有相关任务
+      - 汇报失败原因，让皇帝决策
+    priority: "high"
+
+  - name: "加速比报告"
+    description: "返回性能指标"
+    content: |
+      并行执行必须返回性能数据：
+      - theoretical_speedup：理论加速比
+      - actual_time：实际耗时
+      - serial_time：如果串行执行的耗时
+      - 帮助系统评估并行效果
+    priority: "medium"
+
+## ═══════════════════════════════════════════════════════
+## 文件操作约束
+## ═══════════════════════════════════════════════════════
+
+file_operations:
+  - name: "先检查后操作"
+    description: "创建前检查是否存在"
+    content: |
+      文件操作必须谨慎：
+      - 创建文件前必须检查是否已存在
+      - 修改文件前必须读取当前内容
+      - 删除文件前必须确认（不建议删除）
+    priority: "high"
+
+  - name: "缩进一致性"
+    description: "编辑时保持缩进一致"
+    content: |
+      编辑文件时严格保持缩进：
+      - 空格和制表符不能混用
+      - 缩进层级必须保持一致
+      - 使用 verify_edit_context 验证编辑
+    priority: "high"
+
+  - name: "使用 CLI 工具"
+    description: "优先使用项目工具"
+    content: |
+      文件创建优先级：
+      1. 优先使用项目 CLI 工具（如 ionic generate）
+      2. 如果 CLI 失败，再手动创建
+      3. 手动创建后要验证文件格式正确
+    priority: "medium"
+
+  - name: "备份策略"
+    description: "重要文件编辑前备份"
+    content: |
+      重要配置文件编辑前进行备份：
+      - domain.yaml → domain.yaml.bak
+      - 关键业务文件备份
+      - 便于回滚
+    priority: "medium"
+
+## ═══════════════════════════════════════════════════════
+## 安全约束
+## ═══════════════════════════════════════════════════════
+
+security:
+  - name: "禁止硬编码凭证"
+    description: "绝不硬编码密码/Token"
+    content: |
+      禁止以下做法：
+      - 硬编码密码、API Key、Token
+      - 提交到代码库的任何凭证
+      - 明文存储敏感信息
+      使用环境变量或配置管理系统。
+    priority: "high"
+
+  - name: "输入验证"
+    description: "所有外部输入都要验证"
+    content: |
+      对所有外部输入进行验证：
+      - 用户输入：长度、格式、内容
+      - API 输入：合法性、类型检查
+      - 文件输入：大小、格式、内容检查
+    priority: "high"
+
+  - name: "SQL 注入防护"
+    description: "防止 SQL 注入"
+    content: |
+      数据库操作必须防止 SQL 注入：
+      - 使用参数化查询
+      - 不允许字符串拼接 SQL
+      - 对用户输入进行转义
+    priority: "high"
+
+  - name: "XSS 防护"
+    description: "防止 XSS 攻击"
+    content: |
+      Web 输出必须防止 XSS：
+      - 用户生成的内容必须转义
+      - 使用安全的 HTML 渲染库
+      - 不允许直接注入 HTML/JavaScript
+    priority: "high"
+
+## ═══════════════════════════════════════════════════════
+## 文档约束
+## ═══════════════════════════════════════════════════════
+
+documentation:
+  - name: "代码注释"
+    description: "复杂逻辑必须有注释"
+    content: |
+      代码注释要求：
+      - 复杂算法必须注释说明
+      - 业务逻辑必须说明 why，不仅仅是 what
+      - 后续可能修改的地方注释标记
+    priority: "medium"
+
+  - name: "函数文档"
+    description: "公开函数需要文档"
+    content: |
+      公开 API 的文档要求：
+      - 说明函数的用途
+      - 说明参数的含义和类型
+      - 说明返回值
+      - 说明可能抛出的异常
+    priority: "medium"
+
+  - name: "变更日志"
+    description: "重大变更记录"
+    content: |
+      重大变更需要记录：
+      - API 变更：向后兼容性说明
+      - 数据库变更：迁移脚本
+      - 配置变更：说明影响范围
+    priority: "medium"
+
+---
+
+## 使用说明
+
+### 如何添加新约束？
+
+1. 在对应的分类下添加新条目：
+   ```yaml
+   universal:
+     - name: "约束名称"
+       description: "简短描述"
+       content: "详细内容"
+       priority: "high|medium|low"
+   ```
+
+2. 下次任何 Agent 被调用时，Plugin 会自动注入新约束
+
+### 如何更新现有约束？
+
+直接编辑对应条目的 `content` 字段，无需修改其他文件
+
+### 如何禁用约束？
+
+使用 `enabled: false` 标记：
+```yaml
+- name: "约束名称"
+  enabled: false
+```
+
+### 优先级说明
+
+- `high`：必须遵守的强制约束
+- `medium`：应该遵守的推荐约束
+- `low`：可选的参考约束
+
+---
+
+**最后更新**：2026-03-14
+**维护人**：Plugin 自动注入系统

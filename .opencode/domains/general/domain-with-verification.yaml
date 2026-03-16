@@ -1,0 +1,242 @@
+name: general
+description: 通用编程域，处理不属于其他专用域的任务：bug修复、功能开发、代码重构、问题排查等
+version: 1.0.0
+
+# ─────────────────── 全局约束 ───────────────────
+constraints:
+  - "禁止省略输出，必须完整展示每个步骤的结果"
+  - "遇到错误只重试一次，失败则报错退出，禁止跳过"
+  - "代码变更必须通过测试才算完成"
+  - "生成内容必须立即落盘，返回文件路径后结束，禁止只展示在对话框"
+
+# ─────────────────── 流水线定义（包含验证标准）───────────────────
+pipeline:
+  # 【Level 1：步骤一】任务分析
+  - id: analyze
+    name: 任务分析
+    description: 扫描相关代码，理解现有结构和需求，输出分析报告
+    skill: analyze
+    uses: [yibu, hubu]  # Level 2：代理并行
+    depends_on: []
+
+    # ✅ 成功标识（Level 1）
+    success_criteria:
+      - type: file_exists
+        path: task-analysis.md
+        error_msg: "任务分析报告未生成"
+      - type: file_not_empty
+        path: task-analysis.md
+        error_msg: "分析报告为空"
+      - type: file_size_min
+        path: task-analysis.md
+        bytes: 100
+        error_msg: "分析报告过小（< 100 bytes）"
+      - type: no_error_keywords
+        path: task-analysis.md
+        keywords: ["ERROR", "FAILED", "无法分析"]
+        error_msg: "分析报告包含错误信息"
+      - type: agent_all_done
+        error_msg: "不是所有代理都完成了（Level 2）"
+
+    # ❌ 失败标识（Level 1）
+    failure_criteria:
+      - type: timeout
+        max_seconds: 600
+        error_msg: "分析步骤超时（> 600 秒）"
+
+    # 重试和处理策略
+    retry_max: 1
+    on_success: continue  # 成功时进入下一步
+    on_failure: halt      # 失败时停止整个流水线
+
+  # 【Level 1：步骤二】代码实现
+  - id: implement
+    name: 代码实现
+    description: 按分析报告实现代码变更，执行构建验证
+    skill: implement
+    uses: [gongbu, bingbu]  # Level 2：代理并行
+    depends_on: [analyze]   # 依赖前一步
+
+    # ✅ 成功标识（Level 1）
+    success_criteria:
+      # 文件修改输出验证
+      - type: file_exists
+        path: implementation-report.md
+        error_msg: "实现报告未生成"
+      - type: file_not_empty
+        path: implementation-report.md
+        error_msg: "实现报告为空"
+
+      # 代码文件验证
+      - type: file_exists
+        path: src/
+        error_msg: "源文件目录不存在"
+
+      # 编译验证
+      - type: no_error_keywords
+        path: build.log
+        keywords: ["error", "failed", "compilation failed"]
+        error_msg: "编译失败（build.log 中含有错误）"
+
+      # Level 3：子任务并行验证
+      - type: no_error_keywords
+        path: implementation-report.md
+        keywords: ["FAIL", "failed file"]
+        error_msg: "有文件修改失败（Level 3）"
+
+    # ❌ 失败标识（Level 1）
+    failure_criteria:
+      - type: timeout
+        max_seconds: 1200
+        error_msg: "实现步骤超时（> 1200 秒）"
+      - type: no_error_keywords
+        path: implementation-report.md
+        keywords: ["FAIL", "ERROR"]
+        error_msg: "实现报告显示失败"
+
+    retry_max: 2  # 此步可重试 2 次
+    on_success: continue
+    on_failure: retry  # 失败时重试，而不是直接停止
+
+  # 【Level 1：步骤三】测试验证
+  - id: verify
+    name: 测试验证
+    description: 代码审查 + 运行测试，确保质量
+    skill: verify
+    uses: [xingbu, bingbu]  # Level 2：代理并行
+    depends_on: [implement]
+
+    # ✅ 成功标识（Level 1）
+    success_criteria:
+      # 审查报告
+      - type: file_exists
+        path: code-review.md
+        error_msg: "代码审查报告未生成"
+
+      # 测试结果
+      - type: file_exists
+        path: test-results.json
+        error_msg: "测试结果文件未生成"
+
+      # 测试通过
+      - type: no_error_keywords
+        path: test-results.json
+        keywords: ["failed", "error", "FAIL"]
+        error_msg: "测试未全部通过"
+
+      # 审查通过
+      - type: no_error_keywords
+        path: code-review.md
+        keywords: ["CRITICAL", "FAILED"]
+        error_msg: "代码审查发现关键问题"
+
+    # ❌ 失败标识（Level 1）
+    failure_criteria:
+      - type: timeout
+        max_seconds: 600
+        error_msg: "验证步骤超时（> 600 秒）"
+
+    retry_max: 1
+    on_success: continue
+    on_failure: halt  # 最后一步失败则停止
+
+# ─────────────────── 变量配置 ───────────────────
+variables:
+  - name: task_description
+    description: 任务描述（bug修复/功能/重构等），可选
+    required: false
+  - name: task_priority
+    description: 优先级（high/medium/low）
+    required: false
+
+# ─────────────────── 完整的验证流程说明 ───────────────────
+verification_flow:
+  level_1_step_verification: |
+    ✅ Level 1 验证流程（步骤成功/失败）
+
+    对每个步骤执行完成后：
+    1. 检查所有 success_criteria
+    2. 如果全部通过 → 步骤状态为 SUCCESS
+    3. 如果部分通过 → 步骤状态为 PARTIAL
+    4. 如果全部失败 → 步骤状态为 FAILED
+
+    根据 on_success/on_failure 决定下一步：
+    - continue: 进入下一步
+    - retry: 重新执行（最多 retry_max 次）
+    - halt: 停止流水线，报错退出
+
+  level_2_agent_verification: |
+    ✅ Level 2 验证流程（代理成功/失败）
+
+    对每个步骤的并行代理：
+    1. 同时调用所有代理
+    2. 跟踪每个代理的 status（pending/in_progress/done/failed）
+    3. 统计结果：
+       - ALL_DONE: 所有代理完成
+       - ALL_FAILED: 所有代理失败
+       - PARTIAL: 部分代理成功
+    4. 触发 Level 1 的成功条件检查
+
+  level_3_subtask_verification: |
+    ✅ Level 3 验证流程（子任务成功/失败）
+
+    对 gongbu agent 的文件修改：
+    1. 自动分析文件依赖关系
+    2. 拓扑排序分层
+    3. 对每层使用 Promise.all() 并行修改
+    4. 每个文件修改返回：
+       - status: pending/in_progress/done/failed
+       - duration: 执行时间（ms）
+       - error: 失败原因（如果有）
+    5. 聚合结果为 GongbuParallelResult：
+       - status: PASS/PARTIAL/FAIL
+       - theoretical_speedup: 加速比
+       - summary: {total, passed, failed, skipped}
+    6. 返回详细报告供 Level 1 验证使用
+
+example_flow: |
+  【完整的三层验证链】
+
+  用户: /start 修复表单验证 bug
+
+  ↓ Level 1: analyze 步骤
+  ├─ Level 2: yibu + hubu 并行执行
+  │  ├─ yibu: 扫描本地代码 → status: done
+  │  └─ hubu: 搜索文档 → status: done
+  ├─ 检查 Level 1 成功条件
+  │  ├─ ✅ task-analysis.md 存在
+  │  ├─ ✅ 文件非空
+  │  ├─ ✅ 大小 > 100 bytes
+  │  ├─ ✅ 无错误关键字
+  │  └─ ✅ 所有代理完成
+  ├─ 结果: SUCCESS → 进入下一步
+
+  ↓ Level 1: implement 步骤
+  ├─ Level 2: gongbu + bingbu 并行执行
+  │  ├─ gongbu: 修改 3 个页面
+  │  │  ├─ Level 3: 自动检测依赖
+  │  │  │  ├─ 第1层: [Login.tsx, Signup.tsx, Profile.tsx] 并行修改
+  │  │  │  └─ 加速比: 3.0x
+  │  │  └─ 返回 GongbuParallelResult (status: PASS)
+  │  └─ bingbu: 执行编译 → status: done
+  ├─ 检查 Level 1 成功条件
+  │  ├─ ✅ implementation-report.md 存在
+  │  ├─ ✅ 文件非空
+  │  ├─ ✅ 无编译错误
+  │  └─ ✅ Level 3 子任务全部通过
+  ├─ 结果: SUCCESS → 进入下一步
+
+  ↓ Level 1: verify 步骤
+  ├─ Level 2: xingbu + bingbu 并行执行
+  │  ├─ xingbu: 代码审查 → status: done
+  │  └─ bingbu: 运行测试 → status: done
+  ├─ 检查 Level 1 成功条件
+  │  ├─ ✅ code-review.md 存在
+  │  ├─ ✅ test-results.json 存在
+  │  ├─ ✅ 所有测试通过
+  │  └─ ✅ 无代码审查问题
+  ├─ 结果: SUCCESS
+
+  ↓ 流水线完成 ✅
+  总耗时: 4 分钟（vs 12 分钟无并行）
+  加速比: 3.0x (Level 2) × 3.0x (Level 3) = 综合效果明显

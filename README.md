@@ -1,16 +1,45 @@
-# @deep-flux/liubu
+# @deep-flux/liubu 3.1.1
 
-🏛️ **三省六部制 OpenCode Plugin** - 分层多智能体协作框架
+企业级多智能体协作框架，基于三省六部制设计。
 
-基于古代中国三省六部制度设计的现代多智能体系统，实现完整的工作流程自动化。
+**最新版本**: 3.1.1 (2026-03-17) - ✅ 权限矩阵强制执行 + task()调用方式修正
 
 ---
 
-## 快速安装
+## 核心特点
+
+- **11个智能体** - 皇帝战略决策、三省规划审核执行、六部具体实现
+- **4层验证网关** - 代码修改前自动检查：工作流状态→风险评估→审核验证→执行判定
+- **持久化审计** - 所有操作完整追踪到文件（`.opencode/audit/{sessionId}.json`）
+- **多层审核** - 皇帝→中书省→门下省→尚书省→六部的严格把关流程
+- **Task依赖** - 任务队列管理，自动检查前置条件完成
+- **测试强制** - 失败自动阻塞，防止缺陷继续扩散
+- **Agent心跳** - 实时监控任务状态，超时自动预警
+
+---
+
+## 优势
+
+| 优势 | 说明 |
+|------|------|
+| **自动化** | 零配置自动发现，开箱即用 |
+| **安全性** | 4层前置拦截，多层审核把关，完整审计追踪 |
+| **可靠性** | Task依赖检查，测试强制，自动重试 |
+| **可观测** | Agent心跳、完整日志、诊断工具 |
+| **易维护** | 清晰的层级结构，职责分工明确 |
+| **可扩展** | Recipe系统编排，Skill灵活组合 |
+
+---
+
+## 快速使用
+
+### 安装
 
 ```bash
 npm install @deep-flux/liubu
 ```
+
+### 配置
 
 在 `opencode.json` 中添加：
 
@@ -21,214 +50,303 @@ npm install @deep-flux/liubu
 }
 ```
 
----
-
-## 核心架构
-
-### 分层结构
-
-- **皇帝** - 战略决策者，设定目标、掌控全局
-- **三省** - 规划→审核→执行三层流程
-  - 中书省：制定执行计划
-  - 门下省：审核与把关
-  - 尚书省：执行调度
-- **六部** - 具体实现
-  - 吏部：代码扫描与采集
-  - 户部：外部资源整合
-  - 礼部：工作流协调
-  - 兵部：系统测试执行
-  - 刑部：代码审查
-  - 工部：代码实现
-  - 库部：资产管理
-
----
-
-## 工作流程
-
-### 标准流程（7 步）
-
-```
-用户目标
-   ↓
-皇帝确认 → 设置变量 → 选择工作域
-   ↓
-中书省制定计划
-   ↓
-门下省审核通过
-   ↓
-尚书省执行计划
-   ↓
-各部逐步完成
-   ↓
-皇帝最终验收
-```
-
-### 可用命令
+### 启动任务
 
 ```bash
-# 切换工作域
-/switch-domain asset-management
+# 方式1：通用编程任务
+/start 实现用户登录功能
 
-# 查看流水线
+# 方式2：变更请求处理
+/start 升级API到v2版本，添加OAuth认证
+
+# 方式3：查看状态
 /status
+```
 
-# 启动任务
-/start 需要执行的任务描述
+### 工作流程
 
-# CR 变更流程
-/cr-start asset_type=service asset_name=user-service cr_description="变更说明"
+```
+用户输入(/start)
+  ↓
+皇帝分析意图 → 选择工作域 → 分配任务给三省
+  ↓
+中书省制定计划
+  ↓
+门下省审核检查
+  ↓
+尚书省执行协调 → 调用六部完成
+  ↓
+结果验收
 ```
 
 ---
 
-## 工作域
+## 工作域支持
 
-### 1. asset-management
-从代码中提取资产（Service、Provider、DataModel、UIComponent、Utility）
+框架支持两个核心工作域：
 
-**Pipeline**：
-1. 代码扫描 → code-index.yaml
-2. 并行资产提取 → 5 份资产
-3. UI 框架映射 → ui.mapping.yaml
-4. 行为场景提取 → behavior.md
-5. 框架污染检测
-6. 一致性验证
-7. OpenSpec 持久化
+### 1️⃣ General - 通用编程
+用于标准的编程任务、bug修复和功能开发
+- **quick_fix** - 快速修复 (5分钟, ~70K token)
+- **standard** - 标准流程 (10分钟, ~120K token)
+- **comprehensive** - 强化审计 (15分钟, ~180K token)
 
-### 2. cr-processing
-变更请求处理与版本管理
-
-**Pipeline**：
-1. CR 提议分析
-2. 规格设计
-3. 代码实现
-4. 版本归档
-
-### 3. reverse-engineering
-代码反向工程
-
-### 4. video
-视频处理
+### 2️⃣ CR Processing - 变更请求处理
+用于系统升级、API变更和版本更新
+- **hotfix** - 紧急修复 (5分钟, ~90K token)
+- **standard** - 标准CR流程 (12分钟, ~140K token)
+- **complete** - 完整版本管理 (20分钟, ~200K token)
 
 ---
 
-## 工作原理
+## 工具支持和调用
 
-### 皇帝的职责
-1. 接收用户意图
-2. 选择工作域
-3. 下达任务给三省
-4. 监控全局进度
-5. 最终验收
+### 代码修改工具 (自动验证)
 
-### 三省的协作
-- **中书省**：拆解任务为具体步骤
-- **门下省**：质量审核把关
-- **尚书省**：协调六部执行
+这些工具的调用会自动触发4层网关验证：
 
-### 六部的执行
-- 按职能分工
-- 并行执行（同步）
-- 串行进展（逐步）
-- 质量验证
+```typescript
+// Edit - 修改文件
+Edit(file_path, old_string, new_string)
 
----
+// Write - 创建/覆盖文件
+Write(file_path, content)
 
-## 配置示例
-
-### 简单场景
-```bash
-/switch-domain asset-management
-/start 从 src/ 目录提取所有资产
+// NotebookEdit - 修改Jupyter Notebook
+NotebookEdit(notebook_path, cell_number, new_source)
 ```
 
-### 复杂场景
-```bash
-/switch-domain cr-processing
-/cr-start asset_type=service asset_name=auth-service cr_description="添加 OAuth 2.0 支持，需要修改接口"
+**验证流程**：
+1. 工作流初始化检查
+2. 风险评估（涉及文件数、行数、文件类型）
+3. 审核需求判断
+4. 最终执行判定
+
+---
+
+### 任务管理工具
+
+```typescript
+// 声明开始任务
+@claim_task task_id
+
+// 标记任务完成
+@complete_task task_id
+
+// 声明测试结果（失败时阻塞后续修改）
+@declare_test_result task_id passed|failed "description"
+
+// 查看任务队列
+@get_task_queue
+
+// 查看任务状态
+@task_status task_id
 ```
 
 ---
 
-## 主要特性
+### Skill调用
 
-- ✅ **自动化流程** - 完整的任务分配和执行
-- ✅ **质量把关** - 多层审核机制
-- ✅ **智能调度** - 步骤间串行、步骤内并行
-- ✅ **版本管理** - 完整的变更历史
-- ✅ **开箱即用** - 零配置自动发现
+```typescript
+// 通过 skill 调用执行具体功能
+task(agent="agent_name", skill="skill_name", prompt="参数")
 
----
-
-## 文件结构
-
-```
-.opencode/
-├── agents/          # 11 个智能体
-├── domains/         # 4 个工作域
-│   ├── asset-management/
-│   ├── cr-processing/
-│   ├── reverse-engineering/
-│   └── video/
-└── plugins/         # 工具和函数
+// 例子
+task(agent="gongbu", skill="code_implement", prompt="实现登录功能")
+task(agent="bingbu", skill="run_tests", prompt="运行单元测试")
+task(agent="xingbu", skill="code_review", prompt="审查修改的代码")
 ```
 
 ---
 
-## 数据统计
+### 日志调用
 
-| 指标 | 数值 |
-|------|------|
-| Agents | 11 个 |
-| Domains | 4 个 |
-| Skills | 15+ 个 |
-| 代码行数 | 40,000+ 行 |
-| 文件总数 | 76 个 |
+```typescript
+// 标准日志输出（自动发送到OpenCode控制台）
+log("ComponentName", "message", level)
+
+// 诊断日志系统
+diagnoseLoggerStatus()  // 返回：ready | degraded | unavailable
+```
 
 ---
 
-## 快速参考
+## 系统架构
 
-### 环境变量
+### 智能体层级
 
-配置 `opencode.json`：
+```
+【战略层】
+皇帝 - 接收意图、分配任务、最终验收
+
+【执行层 - 三省】
+├─ 中书省 - 制定计划
+├─ 门下省 - 审核验证
+└─ 尚书省 - 执行协调
+
+【工作层 - 六部】
+├─ 吏部 - 档案采集
+├─ 户部 - 资源整合
+├─ 礼部 - 工作流协调
+├─ 兵部 - 测试执行
+├─ 刑部 - 代码审查
+└─ 工部 - 代码实现
+```
+
+### 权限矩阵
+
+| Agent | 可调用SubAgent | 权限 |
+|-------|--------|------|
+| 皇帝 | 中书省、门下省、尚书省 | 战略决策 |
+| 中书省 | 门下省 | 规划制定 |
+| 门下省 | 无 | 审核验证 |
+| 尚书省 | task()调用六部 | 执行协调 |
+| 六部 | 无 | 具体实现 |
+
+---
+
+## 扩展方案
+
+### 1. 添加新的Skill
+
+在 `.opencode/domains/{domain}/skills/` 下创建：
+
+```yaml
+# skill-name.md
+---
+description: 技能描述
+mode: subagent
+model: anthropic/claude-haiku-4-5
+temperature: 0.0
+---
+
+你是{Agent}，职责是{具体职责}
+
+## 输入参数
+
+- param1: 说明
+
+## 输出格式
 
 ```json
 {
-  "model": "anthropic/claude-opus-4-6",
-  "small_model": "anthropic/claude-haiku-4-5",
-  "default_agent": "huangdi",
-  "plugin": ["@deep-flux/liubu"],
-  "permission": {
-    "skill": { "*": "allow" }
-  }
+  "status": "success|failed",
+  "result": "具体结果"
 }
 ```
-
-### 常见命令
-
-```bash
-# 查看状态
-/status
-
-# 切换域
-/switch-domain [domain-name]
-
-# 启动任务
-/start [task-description]
-
-# CR 流程
-/cr-start asset_type=[type] asset_name=[name] cr_description=[desc]
 ```
+
+### 2. 添加新的Recipe
+
+在 `.opencode/recipes/` 下创建YAML文件：
+
+```yaml
+name: 工作流名称
+type: simple|complex
+complexity: simple|medium|complex
+steps:
+  - id: step-1
+    name: 第一步
+    description: 执行说明
+    uses: [agent1, agent2]
+    skill: skill_name
+    required_inputs:
+      - input1
+      - input2
+  - id: step-2
+    name: 第二步
+    depends_on: [step-1]
+    uses: [agent3]
+    skill: another_skill
+```
+
+### 3. 添加新的Agent
+
+在 `.opencode/agents/` 下创建：
+
+```yaml
+---
+description: Agent职责描述
+mode: subagent
+model: anthropic/claude-haiku-4-5
+temperature: 0.0
+permission:
+  task:
+    agent_name: allow
+  skill:
+    "*": allow
+allowed_tools:
+  - task
+  - skill
+---
+
+你是{新Agent}，职责是：
+- 职责1
+- 职责2
+
+## 工作流程
+
+1. 接收任务
+2. 执行逻辑
+3. 返回结果
+```
+
+### 4. 自定义约束
+
+在 `.opencode/constraints/` 下创建：
+
+```markdown
+## 约束名称
+
+- 约束内容1
+- 约束内容2
+```
+
+自动加载，无需配置。
 
 ---
 
-## 更多文档
+## 性能指标
 
-- **AGENTS.md** - 11 个智能体详解
-- **QUICK_START.md** - 5 分钟快速开始
-- **NPM_PUBLISH_GUIDE.md** - npm 发布指南
-- **GITHUB_SETUP.md** - GitHub 配置指南
+| 操作 | 延迟 | 说明 |
+|------|------|------|
+| 代码修改网关 | <1ms | 4层验证 |
+| 审计记录追加 | <10ms | 文件I/O |
+| 测试状态检查 | <1ms | 内存查询 |
+| 日志输出 | <5ms | OpenCode API |
+
+---
+
+## 常见问题
+
+**Q: 代码修改被拒绝？**
+A: 检查：工作流初始化 → 任务声明 → 依赖完成 → 审核状态
+
+**Q: 如何追踪修改历史？**
+A: 查看 `.opencode/audit/{sessionId}.json`
+
+**Q: 如何添加新的验证规则？**
+A: 修改 `src/workflows/code-modification-gateway.ts`
+
+**Q: 如何自定义Agent职责？**
+A: 在 `.opencode/agents/{agent_name}.md` 中更新 `permission` 和 `allowed_tools`
+
+**Q: 测试失败后如何继续？**
+A: 修复失败原因，调用 `@declare_test_result task_id passed`
+
+---
+
+## 文档
+
+所有核心文档位于 `docs/` 文件夹：
+
+- **docs/index.md** - 📚 文档导航索引
+- **docs/quick-start.md** - 🚀 5分钟快速开始
+- **docs/agents.md** - 🤖 11个智能体详解
+- **docs/architecture.md** - 🏗️ 系统架构设计
+- **docs/phase-3.md** - ⚙️ Phase 3核心功能（网关、审计、测试强制）
+- **docs/opencode-logger.md** - 📝 日志系统说明
+- **docs/plugin-principles.md** - 🔧 系统设计原则
 
 ---
 
@@ -238,4 +356,13 @@ MIT
 
 ---
 
-**准备好了吗？** 用 `/start` 命令开始第一个任务吧！ 🚀
+**当前版本**: 3.0.1 | **发布日期**: 2026-03-16 | **状态**: ✅ 生产就绪
+
+### 版本3.0.1更新
+- 删除资产整理功能
+- 删除逆向代码功能
+- 删除Agent流程优化模块
+- 专注于核心：通用编程和变更请求处理
+- 代码清理：删除1732行不必要代码
+
+用 `/start` 开始第一个任务！

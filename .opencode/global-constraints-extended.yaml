@@ -1,0 +1,414 @@
+# 扩展的全局约束定义 - 包含所有域和 Agent 的约束
+#
+# 结构：
+# 1. universal - 所有 Agent 必须遵守
+# 2. domain_* - 特定域的所有 Agent
+# 3. agent_* - 特定类型的所有 Agent（当前保留）
+# 4. domain_*_agent - 特定域中的特定 Agent
+#
+# 加载顺序：universal → domain → agent_type → domain_agent（后者覆盖前者）
+
+version: 1.0
+
+## ═══════════════════════════════════════════════════════
+## Level 1: 全局通用约束（所有 Agent 必须遵守）
+## ═══════════════════════════════════════════════════════
+
+universal:
+  - name: "完整输出"
+    description: "必须展示每个步骤的完整结果，不允许省略"
+    content: "禁止省略输出，必须完整展示每个步骤的结果和中间过程"
+    priority: "high"
+
+  - name: "失败处理"
+    description: "遇到错误只重试一次，失败则报错退出"
+    content: "遇到错误只重试一次，失败则报错退出，禁止跳过失败直接进入下一步"
+    priority: "high"
+
+  - name: "代码质量"
+    description: "代码变更必须通过测试才算完成"
+    content: "代码变更必须通过测试才算完成，测试失败不得进入生产"
+    priority: "high"
+
+  - name: "落盘要求"
+    description: "生成内容必须立即落盘"
+    content: "生成内容必须立即落盘（写入文件），返回文件路径，禁止只展示在对话框"
+    priority: "high"
+
+  - name: "原样汇报"
+    description: "执行结果原样汇报"
+    content: "执行结果原样汇报，不美化不隐瞒，问题清晰陈述"
+    priority: "high"
+
+  - name: "不自行裁决"
+    description: "遇到分歧上报皇帝"
+    content: "遇到分歧或不确定之处，上报皇帝决策，不自行裁决"
+    priority: "medium"
+
+  - name: "流程尊重"
+    description: "严格遵守流水线流程"
+    content: "严格遵守流水线中定义的步骤顺序，绝不跳步"
+    priority: "high"
+
+## ═══════════════════════════════════════════════════════
+## Level 2: 域级约束（特定域的所有 Agent）
+## ═══════════════════════════════════════════════════════
+
+domain_asset_management:
+  - name: "资产完整性"
+    description: "提取的 5 份资产必须完整"
+    content: |
+      提取的 5 份资产必须完整，缺一不可：
+      - Service/API 接口定义
+      - DataModel/数据结构定义
+      - UIComponent/前端组件
+      - Provider/依赖提供者
+      - Utility/工具函数库
+    priority: "high"
+
+  - name: "版本控制"
+    description: "所有资产必须版本化"
+    content: |
+      所有资产必须版本化：
+      - 每个资产都必须有 version 字段
+      - 版本遵循 Semantic Versioning
+      - 版本历史必须完整保存
+    priority: "high"
+
+  - name: "一致性验证"
+    description: "资产间必须一致性验证"
+    content: |
+      资产间必须通过一致性验证：
+      - Service 的字段在 DataModel 中都有定义
+      - UIComponent 的 Props 在 Service 返回类型中有对应
+      - 无孤立的 Utility 或 Provider
+    priority: "high"
+
+  - name: "提取精度"
+    description: "资产提取精度不低于 95%"
+    content: |
+      资产提取必须准确：
+      - 无重复提取（同一资产不能出现 2 次）
+      - 无遗漏（关键资产必须被提取）
+      - 类型识别准确率 >= 95%
+    priority: "high"
+
+domain_cr_processing:
+  - name: "CR 流程"
+    description: "必须遵循 CR 流程"
+    content: |
+      CR 处理必须遵循完整流程：
+      1. cr-proposal：提案阶段（定义变更）
+      2. cr-specification：规范阶段（详细设计）
+      3. cr-implementation：实现阶段（代码修改）
+      4. cr-persist：持久化阶段（保存版本）
+      任何步骤不能跳过，必须顺序执行
+    priority: "high"
+
+  - name: "版本历史"
+    description: "版本历史必须完整"
+    content: |
+      版本历史维护要求：
+      - 每个 CR 必须创建新版本
+      - 保留所有历史版本
+      - 记录 CR 者、时间、变更内容
+      - 支持版本回滚
+    priority: "high"
+
+  - name: "兼容性检查"
+    description: "必须检查向后兼容性"
+    content: |
+      CR 实现必须检查兼容性：
+      - 删除接口必须标记 deprecated 而非直接删除
+      - 修改参数必须检查是否破坏现有代码
+      - 新增功能必须不影响现有功能
+      - 必须提供迁移指南
+    priority: "high"
+
+domain_reverse_engineering:
+  - name: "代码分析深度"
+    description: "分析必须达到 AST 级别"
+    content: |
+      代码分析必须达到 AST 级别：
+      - 不能只是字符串匹配或正则表达式
+      - 必须真正解析代码结构
+      - 识别变量、函数、类、接口等语义单元
+      - 建立调用关系图和依赖图
+    priority: "high"
+
+  - name: "项目标准化"
+    description: "输出完整的项目标准文档"
+    content: |
+      项目标准化输出必须包括：
+      - 项目结构分析
+      - 命名规范总结
+      - 代码风格指南
+      - 设计模式识别
+      - 改进建议
+    priority: "high"
+
+domain_video:
+  - name: "视频处理标准"
+    description: "视频处理必须符合标准"
+    content: |
+      视频处理必须符合标准：
+      - 编码格式：H.264 或 VP9
+      - 分辨率：1080p 或更高
+      - 帧率：24/30/60 fps
+      - 比特率：2-10 Mbps（取决于分辨率）
+      - 音频：AAC 或 Opus，128kbps 以上
+    priority: "high"
+
+  - name: "格式转换"
+    description: "格式转换必须无损"
+    content: |
+      格式转换必须：
+      - 保持图像质量
+      - 保持音频清晰度
+      - 不引入水印或标记
+      - 保存原始元数据
+    priority: "high"
+
+domain_general:
+  - name: "通用编程规范"
+    description: "代码必须符合通用规范"
+    content: |
+      代码必须符合通用规范：
+      - 类型明确（避免 any）
+      - 错误处理完善
+      - 代码注释充分
+      - 单元测试覆盖 >= 80%
+    priority: "high"
+
+## ═══════════════════════════════════════════════════════
+## Level 3: Agent 类型约束（按 Agent 类型）
+## ═══════════════════════════════════════════════════════
+
+agent_implementation:
+  - name: "完整实现"
+    description: "方法体必须完整实现"
+    content: |
+      每个方法体必须完整实现，禁止以下情况：
+      - // TODO: implement
+      - throw new NotImplementedError()
+      - 占位符注释（// placeholder）
+      - 不完整的代码块
+    priority: "high"
+
+  - name: "无省略分支"
+    description: "所有代码分支必须实现"
+    content: |
+      不允许省略任何代码分支或边界情况：
+      - if/else 的所有分支都要实现
+      - switch 语句需要 default 分支
+      - 异常情况必须处理
+    priority: "high"
+
+  - name: "类型明确"
+    description: "避免使用 any 类型"
+    content: |
+      所有类型都必须明确：
+      - 禁止使用 any（除非万不得已）
+      - 函数参数和返回值都要标注类型
+      - 字段和变量的类型都要声明
+    priority: "high"
+
+agent_code_review:
+  - name: "严格审查"
+    description: "逐行检查代码质量"
+    content: |
+      代码审查必须严格：
+      - 逐行检查，不能跳过
+      - 检查点包括：逻辑、性能、安全、可维护性
+      - 发现问题必须清晰指出
+      - 建议改进方案
+    priority: "high"
+
+  - name: "检查清单"
+    description: "使用完整的检查清单"
+    content: |
+      检查清单必须包括：
+      - 代码逻辑：是否正确、高效
+      - 命名：是否清晰、遵循规范
+      - 错误处理：是否完善
+      - 性能：是否有优化机会
+      - 安全：是否有漏洞
+      - 测试：测试覆盖是否充分
+    priority: "high"
+
+agent_verification:
+  - name: "测试覆盖"
+    description: "测试覆盖率必须充分"
+    content: |
+      测试覆盖必须充分：
+      - 单元测试覆盖 >= 80%
+      - 关键路径覆盖 100%
+      - 边界情况都有测试
+      - 异常处理都有测试
+    priority: "high"
+
+  - name: "结果报告"
+    description: "测试结果必须详细报告"
+    content: |
+      测试结果必须详细报告：
+      - 总体通过/失败情况
+      - 覆盖率指标
+      - 失败用例的原因分析
+      - 性能指标（如适用）
+    priority: "high"
+
+## ═══════════════════════════════════════════════════════
+## Level 4: 最细粒度约束（域 + Agent 组合）
+## ═══════════════════════════════════════════════════════
+
+# asset-management 域的约束
+domain_asset_management_yibu:  # 扫描任务
+  - name: "扫描完整性"
+    description: "必须扫描所有代码文件"
+    content: |
+      代码扫描必须完整：
+      - 必须扫描所有代码文件（不能限制文件数量）
+      - 包括所有编程语言
+      - 递归扫描所有目录
+      - 记录扫描统计（文件数、行数等）
+    priority: "high"
+
+  - name: "资产识别"
+    description: "准确识别 5 种资产"
+    content: |
+      必须准确识别以下资产：
+      - Service/API：class/interface 以 Service/API/Controller 命名
+      - DataModel：class/interface 以 Model/Entity/Data 命名
+      - UIComponent：class 以 Component 命名，有 render 方法
+      - Provider：class/function 以 Provider 命名或注入依赖
+      - Utility：class/function 以 Util/Helper 命名，无副作用
+    priority: "high"
+
+domain_asset_management_kubu:  # 资产持久化
+  - name: "持久化完整性"
+    description: "所有资产必须持久化"
+    content: |
+      资产持久化必须完整：
+      - 所有 5 种资产都必须持久化
+      - 无遗漏的资产
+      - 每个资产都有完整的元数据
+      - 保存到 OpenSpec 标准格式
+    priority: "high"
+
+  - name: "格式验证"
+    description: "输出必须符合 OpenSpec"
+    content: |
+      OpenSpec 格式必须符合标准：
+      - 包含 metadata（name, version, description）
+      - 包含 definition（完整的结构定义）
+      - 包含 examples（使用示例）
+      - 包含 relationships（与其他资产的关系）
+    priority: "high"
+
+# cr-processing 域的约束
+domain_cr_processing_menxia:  # CR 审核
+  - name: "兼容性检查"
+    description: "必须检查向后兼容性"
+    content: |
+      必须检查以下兼容性问题：
+      - 接口变更是否破坏现有代码
+      - 参数变更是否需要迁移
+      - 删除功能是否有替代方案
+      - 性能变更是否会影响用户体验
+    priority: "high"
+
+  - name: "安全审查"
+    description: "必须审查安全风险"
+    content: |
+      必须审查以下安全问题：
+      - 是否引入了注入漏洞
+      - 是否有访问控制问题
+      - 是否有加密/认证问题
+      - 是否有日志/监控漏洞
+    priority: "high"
+
+domain_cr_processing_shangshu:  # CR 调度
+  - name: "顺序执行"
+    description: "必须按顺序执行 CR"
+    content: |
+      CR 执行必须按顺序：
+      - 不能跳过任何步骤
+      - 必须遵循 proposal → specification → implementation → persist 的顺序
+      - 每个步骤都要验证通过才能进入下一步
+    priority: "high"
+
+# video 域的约束
+domain_video_gongbu:  # 视频实现
+  - name: "编码标准"
+    description: "必须使用标准编码"
+    content: |
+      视频编码必须符合标准：
+      - 编码格式：H.264（MPEG-4 Part 10）或 VP9
+      - 分辨率：1920x1080（1080p）或更高
+      - 帧率：24fps（电影）、30fps（NTSC）、60fps（高帧率）
+      - 关键帧间隔：2 秒（120 帧）
+    priority: "high"
+
+  - name: "音频标准"
+    description: "音频必须符合标准"
+    content: |
+      音频编码必须符合标准：
+      - 编码格式：AAC（MPEG-4 Audio）或 Opus
+      - 采样率：48kHz（专业）或 44.1kHz（标准）
+      - 比特率：128kbps 或以上
+      - 声道：立体声或 5.1 环绕声
+    priority: "high"
+
+# general 域的约束
+domain_general_gongbu:  # 代码实现
+  - name: "实现完整"
+    description: "代码实现必须完整"
+    content: |
+      代码实现必须完整：
+      - 没有 TODO 注释
+      - 没有占位符实现
+      - 所有分支都有实现
+      - 所有异常都有处理
+    priority: "high"
+
+domain_general_xingbu:  # 代码审查
+  - name: "审查全面"
+    description: "审查必须全面"
+    content: |
+      代码审查必须全面：
+      - 检查逻辑正确性
+      - 检查性能优化机会
+      - 检查代码风格一致性
+      - 检查注释充分性
+      - 检查测试覆盖率
+    priority: "high"
+
+## ═══════════════════════════════════════════════════════
+## 约束加载说明
+## ═══════════════════════════════════════════════════════
+
+#
+# Plugin 加载约束的顺序（后者覆盖前者）：
+#
+# 1. universal（所有 Agent）
+# 2. domain_X（当前域）
+# 3. agent_TYPE（当前 Agent 类型）
+# 4. domain_X_AGENT（最细粒度）
+#
+# 示例：
+#   Agent: gongbu
+#   Domain: asset-management
+#
+#   加载顺序：
+#   1. universal → 所有通用约束
+#   2. domain_asset_management → asset-management 特定约束
+#   3. agent_implementation → gongbu 实现约束
+#   4. domain_asset_management_gongbu → 最细粒度约束
+#
+#   最终 system prompt 包含：
+#   - universal 中的所有约束
+#   - domain_asset_management 中的所有约束
+#   - agent_implementation 中的所有约束
+#   - domain_asset_management_gongbu 中的所有约束
+#   （去重合并）
+#

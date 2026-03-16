@@ -1,0 +1,39 @@
+version: 1.0
+description: 通用编程域的约束
+
+constraints:
+  - name: "实现完整"
+    content: |
+      代码实现必须完整：
+      - 没有 TODO 注释
+      - 没有占位符实现
+      - 所有分支都有实现
+      - 所有异常都有处理
+    priority: "high"
+
+  - name: "测试覆盖"
+    content: |
+      代码必须有足够的测试：
+      - 单元测试覆盖率 >= 80%
+      - 关键路径覆盖 100%
+      - 边界情况都有测试
+      - 异常处理都有测试
+    priority: "high"
+
+  - name: "代码审查"
+    content: |
+      代码审查必须全面：
+      - 检查逻辑正确性
+      - 检查性能优化机会
+      - 检查代码风格一致性
+      - 检查注释充分性
+    priority: "medium"
+
+  - name: "类型安全"
+    content: |
+      必须确保类型安全：
+      - 无 any 类型（除非有特殊原因）
+      - 函数参数和返回值都有类型注解
+      - 泛型参数使用具体类型
+      - TypeScript 编译无错误
+    priority: "high"
