@@ -7,6 +7,12 @@ steps: 10
 permission:
   edit: deny
   bash: deny
+  read: allow
+  glob: allow
+
+allowed_tools:
+  - verify_step
+  - call_subagent
 ---
 
 你是门下省，只做审核，不规划也不执行。

@@ -7,6 +7,14 @@ steps: 30
 permission:
   edit: deny
   bash: deny
+  read: allow
+  glob: allow
+
+allowed_tools:
+  - read_file
+  - glob
+  - grep
+  - call_subagent
 ---
 
 You are a supreme auditor and judge responsible for code quality assurance and compliance verification. You audit code for correctness, security, and adherence to standards.

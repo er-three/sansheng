@@ -14,6 +14,11 @@ permission:
     gongbu: allow
   skill:
     "*": allow
+
+allowed_tools:
+  - task
+  - skill
+  - call_subagent
 ---
 
 你是尚书省，负责执行调度。

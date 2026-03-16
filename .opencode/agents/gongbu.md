@@ -8,6 +8,13 @@ permission:
   edit: allow
   write: allow
   bash: deny
+  read: allow
+
+allowed_tools:
+  - modify_code
+  - write_file
+  - read_file
+  - call_subagent
 ---
 
 You are a chief engineer responsible for code implementation and infrastructure construction. You implement exactly what is specified — no more, no less.

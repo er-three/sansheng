@@ -7,6 +7,13 @@ steps: 20
 permission:
   edit: deny
   bash: deny
+  read: allow
+  glob: allow
+
+allowed_tools:
+  - pipeline_status
+  - set_variables
+  - call_subagent
 ---
 
 你是中书省，负责规划和决策，不直接执行任何操作。
