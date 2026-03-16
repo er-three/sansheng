@@ -6,6 +6,82 @@
 
 ---
 
+## [3.1.0] - 2026-03-17
+
+### 🎉 治理系统完整实现 (Phase 5)
+
+这是一个重大功能发布，包含完整的三省六部多智能体协作框架的实现。
+
+### ✨ 新增功能
+
+#### 治理系统核心
+- **`src/governance/types.ts`** (330 行)
+  - 9个Agent角色完整定义
+  - 15+个核心数据结构（Plan、Step、Task、ExecutionState等）
+  - 完整的枚举定义（TaskStatus、TaskType、Decision、ErrorCode）
+  - 各部门输出格式和通信协议
+
+- **`src/governance/execution-engine.ts`** (517 行)
+  - WorkflowEngine：完整的工作流执行引擎
+  - DependencyResolver：依赖分析和关键路径计算
+  - 支持并行执行和自动重试机制
+
+- **`src/governance/orchestrator.ts`** (280+ 行)
+  - GovernanceOrchestrator：5阶段工作流协调
+  - MinistryDispatcher：任务分发和提示生成
+  - WorkflowStateManager：执行状态管理
+
+#### 完整测试套件
+- **36个通过的测试**（100%通过率）
+- 4个测试文件：types、execution-engine、orchestrator、e2e
+- 单元测试、集成测试、端到端测试覆盖
+
+#### 完整文档
+- **getting-started.md** - 5分钟快速上手指南
+- **governance-implementation.md** - 完整API参考和实现细节
+- **testing.md** - 测试指南和最佳实践
+- **troubleshooting.md** - 故障排除和常见问题解答
+- **examples.ts** - 6个完整工作流示例
+
+### 📊 统计
+
+- **代码量**：3,500+行
+- **测试**：36个（全部通过）
+- **文档**：6个新文档
+- **Git提交**：4个主要提交
+- **编译**：✅ TypeScript无错误
+
+### 🎯 核心特性
+
+- ✅ 5阶段工作流（规划→审核→执行→验证→批准）
+- ✅ 并行执行支持
+- ✅ 循环依赖检测
+- ✅ 关键路径分析
+- ✅ 自动重试和人工干预
+- ✅ 完整的执行追踪
+
+### 📚 文档改进
+
+- 新增推荐阅读顺序
+- 新增快速开始指南
+- 新增完整API参考
+- 新增故障排除指南
+- 新增测试指南
+
+### ⚡ 性能
+
+- 支持多个步骤并行执行
+- 关键路径分析优化执行时间
+- 智能重试机制减少总耗时
+
+### 🔄 向后兼容
+
+- ✅ 完全兼容之前的Agent框架
+- ✅ 保留所有现有功能
+- ✅ 只添加新功能，不改变现有API
+
+---
+
 ## [3.0.1] - 2026-03-16
 
 ### 📦 优化和清理

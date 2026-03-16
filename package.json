@@ -1,6 +1,6 @@
 {
   "name": "@deep-flux/liubu",
-  "version": "3.0.1",
+  "version": "3.1.0",
   "type": "module",
   "description": "三省六部制 OpenCode Plugin - 完整的多智能体协作框架，包含皇帝（战略决策）、三省（规划审核执行）、六部（具体实现）的分层架构",
   "main": "dist/index.js",
