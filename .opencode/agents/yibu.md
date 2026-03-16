@@ -6,6 +6,7 @@ temperature: 0.0
 steps: 40
 permission:
   edit: deny
+  write: deny
   bash: deny
   read: allow
   glob: allow

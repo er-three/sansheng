@@ -37,3 +37,8 @@ export {
   MinistryDispatcher,
   WorkflowStateManager,
 } from "./orchestrator.js"
+
+export {
+  // Examples
+  examples,
+} from "./examples.js"
