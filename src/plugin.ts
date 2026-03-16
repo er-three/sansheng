@@ -45,6 +45,14 @@ import { createConfigManager, ConfigManager } from "./config/manager.js"
 import { getConstraintInjectionProfile, estimateSavingsPercentage } from "./config/constraint-profile.js"
 import { formatConstraints, findRoot, log, isTaskCompleted } from "./utils.js"
 import {
+  validateSubagentCall,
+  createSubagentContext,
+  pushSubagentContext,
+  formatCallStack,
+  MAX_SUBAGENT_DEPTH,
+  SubagentCallContext,
+} from "./workflows/subagent-safety-guard.js"
+import {
   getTaskQueue,
   claimTask,
   completeTask,
@@ -422,10 +430,42 @@ export async function toolExecuteAfterHook(input: Record<string, unknown>, outpu
     const step = domain.pipeline.find((s) => s.skill === skillName || s.id === skillName)
     if (!step) return
 
-    // ─────────────────── Phase 1：任务队列验证 ───────────────────
+    // ─────────────────── Phase 0：SubAgent 陷阱防护 ───────────────────
 
     const sessionId = (input as any).sessionId || (input as any).session_id || "default"
     const agentName = (input as any).agent_name || "unknown"
+
+    // 检查 SubAgent 调用是否安全（防深度嵌套、循环）
+    // 提取 call_subagent 工具的信息
+    const toolName = (input as any).name || (input as any).tool_name || skillName
+    if (toolName && typeof toolName === 'string' && toolName.includes('subagent')) {
+      const subagentName = (input as any).args?.subagent || (input as any).args?.name
+
+      if (subagentName) {
+        // 从 context 中获取或创建调用上下文
+        let context: SubagentCallContext = (input as any).context?.subagentContext ||
+                                            createSubagentContext(MAX_SUBAGENT_DEPTH)
+
+        // 验证 SubAgent 调用是否安全
+        const validation = validateSubagentCall(subagentName, context)
+        if (!validation.allowed) {
+          throw new Error(
+            `[SUBAGENT SAFETY] SubAgent 调用被拒绝\n\n` +
+            `尝试调用: ${subagentName}\n` +
+            `当前调用栈: ${formatCallStack(context.callStack)}\n\n` +
+            `${validation.reason}`
+          )
+        }
+
+        // 更新上下文，传递给 SubAgent
+        const newContext = pushSubagentContext(context, subagentName)
+        log("SubagentSafety",
+            `SubAgent 调用通过验证 [深度${newContext.depth}/${context.maxDepth}]: ${subagentName}`,
+            "debug")
+      }
+    }
+
+    // ─────────────────── Phase 1：任务队列验证 ───────────────────
 
     // 获取任务队列
     const queue = getTaskQueue(sessionId)
