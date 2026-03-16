@@ -68,6 +68,7 @@ import {
 } from "./session/task-queue.js"
 import { getRecipe, validateRecipeCompliance } from "./workflows/recipes.js"
 import { setOpencodeClient } from "./utils.js"
+import { setOpencodeLogClient, logToOpencodeSync } from "./opencode-logger.js"
 import {
   validateCodeModification,
   recordCodeModification,
@@ -110,9 +111,10 @@ function initializePlugin(context?: PluginContext): void {
   // 已初始化，直接返回（防止重复初始化和竞态条件）
   if (isInitialized) return
 
-  // 注册 OpenCode 客户端用于日志集成
+  // 注册 OpenCode 客户端用于日志集成（两个 logger 都注册）
   if (context) {
     setOpencodeClient(context)
+    setOpencodeLogClient(context)  // 新增：使用专用日志 client
   }
 
   if (!cleanupTimer) {
