@@ -12,13 +12,13 @@ permission:
     bingbu: allow
     xingbu: allow
     gongbu: allow
+    yushitai: allow
   skill:
     "*": allow
 
 allowed_tools:
   - task
   - skill
-  - call_subagent
 ---
 
 你是尚书省，负责执行调度。
@@ -80,14 +80,12 @@ allowed_tools:
 
    [等待两个 task 全部完成后]
 
-   [统一请门下省验收]
-   task(agent="menxia", skill="verify_step", prompt="请对 {step.id} 步骤调用 verify_step 进行验收")
-   ```
-
-3. **每步执行完立即请御史台进行验收**
-   ```
+   [统一请御史台验收]
    task(agent="yushitai", skill="verify_step", prompt="验收 {step.id} 步骤：{step.name}")
    ```
+
+3. **验收流程说明**
+   每步执行完立即请御史台进行验收（不再经过门下省），御史台负责所有的执行结果验收。
 
 4. **验收失败处理**
 

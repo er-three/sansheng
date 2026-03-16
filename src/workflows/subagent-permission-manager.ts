@@ -28,7 +28,7 @@ export const SUBAGENT_POLICIES: SubagentPolicy[] = [
   {
     agentName: 'huangdi', // 皇帝
     can_call_subagent: true,
-    subagents_allowed: ['zhongshu', 'menxia', 'shangshu', 'yushitai'],
+    subagents_allowed: ['zhongshu', 'menxia', 'shangshu'],  // 不能直接调用yushitai（御史台是尚书省专用）
   },
   {
     agentName: 'zhongshu', // 中书省
@@ -42,8 +42,8 @@ export const SUBAGENT_POLICIES: SubagentPolicy[] = [
   },
   {
     agentName: 'shangshu', // 尚书省
-    can_call_subagent: true,
-    subagents_allowed: ['yushitai'],
+    can_call_subagent: false,  // 尚书省使用 task() 工具调用六部和御史台，不使用 call_subagent
+    subagents_allowed: [],
   },
   {
     agentName: 'yushitai', // 御史台

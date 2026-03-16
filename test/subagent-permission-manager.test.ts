@@ -20,7 +20,10 @@ describe("SubAgent Permission Manager - 权限管理系统", () => {
       expect(canCallSubagent("huangdi", "zhongshu")).toBe(true)
       expect(canCallSubagent("huangdi", "menxia")).toBe(true)
       expect(canCallSubagent("huangdi", "shangshu")).toBe(true)
-      expect(canCallSubagent("huangdi", "yushitai")).toBe(true)
+    })
+
+    test("皇帝不能调用御史台（御史台是尚书省专用）", () => {
+      expect(canCallSubagent("huangdi", "yushitai")).toBe(false)
     })
 
     test("皇帝不能调用六部", () => {
@@ -54,11 +57,9 @@ describe("SubAgent Permission Manager - 权限管理系统", () => {
       expect(canCallSubagent("kubu")).toBe(false)
     })
 
-    test("尚书省可以调用御史台", () => {
-      expect(canCallSubagent("shangshu", "yushitai")).toBe(true)
-    })
-
-    test("尚书省不能调用其他Agent", () => {
+    test("尚书省不能通过call_subagent调用任何Agent", () => {
+      // 尚书省使用 task() 工具调用六部和御史台，不使用 call_subagent
+      expect(canCallSubagent("shangshu", "yushitai")).toBe(false)
       expect(canCallSubagent("shangshu", "zhongshu")).toBe(false)
       expect(canCallSubagent("shangshu", "menxia")).toBe(false)
       expect(canCallSubagent("shangshu", "gongbu")).toBe(false)
@@ -78,8 +79,8 @@ describe("SubAgent Permission Manager - 权限管理系统", () => {
       expect(allowed).toContain("zhongshu")
       expect(allowed).toContain("menxia")
       expect(allowed).toContain("shangshu")
-      expect(allowed).toContain("yushitai")
-      expect(allowed.length).toBe(4)
+      expect(allowed).not.toContain("yushitai")  // 御史台是尚书省专用
+      expect(allowed.length).toBe(3)
     })
 
     test("获取中书省允许的SubAgent列表", () => {
@@ -240,8 +241,10 @@ describe("SubAgent Permission Manager - 权限管理系统", () => {
       expect(canCallSubagent("zhongshu", "menxia")).toBe(true)
     })
 
-    test("场景3：尚书省请御史台验证", () => {
-      expect(canCallSubagent("shangshu", "yushitai")).toBe(true)
+    test("场景3：尚书省通过task工具调用六部（不用call_subagent）", () => {
+      // 尚书省使用 task() 工具调用六部和御史台，不能使用 call_subagent
+      expect(canCallSubagent("shangshu", "yushitai")).toBe(false)
+      expect(canCallSubagent("shangshu", "gongbu")).toBe(false)
     })
 
     test("场景4：工部不能跳过审核", () => {
