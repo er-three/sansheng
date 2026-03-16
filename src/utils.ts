@@ -173,6 +173,96 @@ export function setOpencodeClient(client: any): void {
 }
 
 /**
+ * 日志配置接口
+ */
+export interface LogConfig {
+  level: "debug" | "info" | "warn" | "error"
+  fileOutput?: {
+    enabled: boolean
+    path: string
+  }
+  format: "text" | "json"
+  modules?: Record<string, "debug" | "info" | "warn" | "error">
+}
+
+/**
+ * 默认日志配置
+ */
+const DEFAULT_LOG_CONFIG: LogConfig = {
+  level: (process.env.OPENCODE_LOG_LEVEL as any) || "info",
+  format: "text",
+  fileOutput: {
+    enabled: process.env.OPENCODE_LOG_FILE ? true : false,
+    path: process.env.OPENCODE_LOG_FILE || ".opencode/logs/app.log"
+  }
+}
+
+let currentLogConfig = { ...DEFAULT_LOG_CONFIG }
+
+/**
+ * 配置日志系统
+ */
+export function configureLogging(config: Partial<LogConfig>): void {
+  currentLogConfig = { ...currentLogConfig, ...config }
+}
+
+/**
+ * 获取当前日志配置
+ */
+export function getLogConfig(): LogConfig {
+  return { ...currentLogConfig }
+}
+
+/**
+ * 检查是否应该输出此日志
+ */
+function shouldLog(
+  category: string,
+  level: "debug" | "info" | "warn" | "error"
+): boolean {
+  const logLevelOrder = { debug: 0, info: 1, warn: 2, error: 3 }
+  const moduleLevel = currentLogConfig.modules?.[category] || currentLogConfig.level
+
+  return logLevelOrder[level] >= logLevelOrder[moduleLevel]
+}
+
+/**
+ * 追加日志到文件
+ */
+function appendLogToFile(
+  category: string,
+  message: string,
+  level: string,
+  timestamp: string
+): void {
+  if (!currentLogConfig.fileOutput?.enabled) {
+    return
+  }
+
+  try {
+    const logPath = currentLogConfig.fileOutput.path
+    ensureDirExists(path.dirname(logPath))
+
+    let output: string
+    if (currentLogConfig.format === "json") {
+      output = JSON.stringify({
+        timestamp,
+        level,
+        category,
+        message
+      }) + "\n"
+    } else {
+      output = `[${timestamp}] [${category}] [${level.toUpperCase()}] ${message}\n`
+    }
+
+    fs.appendFileSync(logPath, output, "utf-8")
+  } catch (error) {
+    // 文件写入失败，不影响主流程
+    // 仅在 console 记录错误
+  }
+}
+
+/**
  * 内部异步日志实现
  */
 async function logAsync(
@@ -180,6 +270,13 @@ async function logAsync(
   message: string,
   level: "debug" | "info" | "warn" | "error"
 ): Promise<void> {
+  // 检查是否应该输出此日志
+  if (!shouldLog(category, level)) {
+    return
+  }
+
+  const timestamp = new Date().toISOString()
+
   // 如果有 OpenCode client，使用官方 API
   if (opencodeClient && opencodeClient.app && opencodeClient.app.log) {
     try {
@@ -189,15 +286,16 @@ async function logAsync(
         message: `[${category}] ${message}`,
         extra: { category },
       })
+      // 成功发送到 API，同时追加到文件（如启用）
+      appendLogToFile(category, message, level, timestamp)
       return
     } catch (error) {
-      // 如果 API 调用失败，降级到 console 输出
+      // 如果 API 调用失败，降级到 console 输出和文件输出
       console.error("Failed to call client.app.log():", error)
     }
   }
 
   // 降级方案：输出到 console.error（更可靠地显示在 CLI 中）
-  const timestamp = new Date().toISOString()
   const prefix = `[${timestamp}] [${category}]`
 
   switch (level) {
@@ -212,6 +310,9 @@ async function logAsync(
       console.error(`${prefix} [FAIL] ${message}`)
       break
   }
+
+  // 同时追加到文件（如启用）
+  appendLogToFile(category, message, level, timestamp)
 }
 
 /**
