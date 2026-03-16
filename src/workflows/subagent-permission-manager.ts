@@ -89,6 +89,23 @@ export const SUBAGENT_POLICIES: SubagentPolicy[] = [
 ]
 
 /**
+ * 策略查询优化：使用 Map 实现 O(1) 查找
+ * 避免 O(n) 的数组线性搜索
+ */
+const POLICY_MAP = new Map<string, SubagentPolicy>(
+  SUBAGENT_POLICIES.map(p => [p.agentName, p])
+)
+
+/**
+ * 获取Agent的权限策略
+ * @param agentName Agent名称
+ * @returns 该Agent的权限策略，不存在则返回 undefined
+ */
+function getAgentPolicy(agentName: string): SubagentPolicy | undefined {
+  return POLICY_MAP.get(agentName)
+}
+
+/**
  * 检查Agent是否有权调用SubAgent
  *
  * @param agentName Agent名称
@@ -96,7 +113,7 @@ export const SUBAGENT_POLICIES: SubagentPolicy[] = [
  * @returns 是否有权限
  */
 export function canCallSubagent(agentName: string, targetSubagent?: string): boolean {
-  const policy = SUBAGENT_POLICIES.find(p => p.agentName === agentName)
+  const policy = getAgentPolicy(agentName)
 
   if (!policy || !policy.can_call_subagent) {
     return false
@@ -116,7 +133,7 @@ export function canCallSubagent(agentName: string, targetSubagent?: string): boo
  * @returns 允许的SubAgent列表
  */
 export function getAllowedSubagents(agentName: string): string[] {
-  const policy = SUBAGENT_POLICIES.find(p => p.agentName === agentName)
+  const policy = getAgentPolicy(agentName)
   return policy?.subagents_allowed || []
 }
 
@@ -174,7 +191,7 @@ export function extractCallerInfo(stack: string): CallerStackInfo {
  * @returns 错误信息
  */
 export function generatePermissionDeniedError(agentName: string, targetSubagent?: string): string {
-  const policy = SUBAGENT_POLICIES.find(p => p.agentName === agentName)
+  const policy = getAgentPolicy(agentName)
 
   if (!policy || !policy.can_call_subagent) {
     return (
