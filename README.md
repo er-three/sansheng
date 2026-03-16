@@ -51,11 +51,11 @@ npm install @deep-flux/liubu
 ### 启动任务
 
 ```bash
-# 方式1：标准任务
-/start 你的任务描述
+# 方式1：通用编程任务
+/start 实现用户登录功能
 
-# 方式2：变更请求
-/cr-start asset_type=service asset_name=auth-service cr_description="添加OAuth"
+# 方式2：变更请求处理
+/start 升级API到v2版本，添加OAuth认证
 
 # 方式3：查看状态
 /status
@@ -76,6 +76,24 @@ npm install @deep-flux/liubu
   ↓
 结果验收
 ```
+
+---
+
+## 工作域支持
+
+框架支持两个核心工作域：
+
+### 1️⃣ General - 通用编程
+用于标准的编程任务、bug修复和功能开发
+- **quick_fix** - 快速修复 (5分钟, ~70K token)
+- **standard** - 标准流程 (10分钟, ~120K token)
+- **comprehensive** - 强化审计 (15分钟, ~180K token)
+
+### 2️⃣ CR Processing - 变更请求处理
+用于系统升级、API变更和版本更新
+- **hotfix** - 紧急修复 (5分钟, ~90K token)
+- **standard** - 标准CR流程 (12分钟, ~140K token)
+- **complete** - 完整版本管理 (20分钟, ~200K token)
 
 ---
 
@@ -318,11 +336,15 @@ A: 修复失败原因，调用 `@declare_test_result task_id passed`
 
 ## 文档
 
-- **QUICK_START.md** - 5分钟快速开始
-- **AGENTS.md** - 11个智能体详解
-- **ARCHITECTURE.md** - 系统架构设计
-- **PHASE_3_SUMMARY.md** - Phase 3实现细节
-- **OPENCODE_LOGGER_FIX.md** - 日志系统说明
+所有核心文档位于 `docs/` 文件夹：
+
+- **docs/index.md** - 📚 文档导航索引
+- **docs/quick-start.md** - 🚀 5分钟快速开始
+- **docs/agents.md** - 🤖 11个智能体详解
+- **docs/architecture.md** - 🏗️ 系统架构设计
+- **docs/phase-3.md** - ⚙️ Phase 3核心功能（网关、审计、测试强制）
+- **docs/opencode-logger.md** - 📝 日志系统说明
+- **docs/plugin-principles.md** - 🔧 系统设计原则
 
 ---
 
@@ -332,6 +354,13 @@ MIT
 
 ---
 
-**当前版本**: 3.0.0 | **发布日期**: 2026-03-16 | **状态**: ✅ 生产就绪
+**当前版本**: 3.0.1 | **发布日期**: 2026-03-16 | **状态**: ✅ 生产就绪
+
+### 版本3.0.1更新
+- 删除资产整理功能
+- 删除逆向代码功能
+- 删除Agent流程优化模块
+- 专注于核心：通用编程和变更请求处理
+- 代码清理：删除1732行不必要代码
 
 用 `/start` 开始第一个任务！

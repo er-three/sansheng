@@ -6,6 +6,45 @@
 
 ---
 
+## [3.0.1] - 2026-03-16
+
+### 📦 优化和清理
+
+删除了资产整理、逆向工程和Agent流程优化相关功能，专注于核心编程能力。
+
+### 🗑️ 删除
+
+- **资产整理功能** (asset-management domain)
+- **逆向工程功能** (reverse-engineering domain)
+- **Agent优化模块** (src/agent/optimization.ts)
+- **相关测试文件** (agent-optimization.test.ts, token-consumption-validation.test.ts)
+
+### 📝 修改
+
+- 更新README，简化工作域说明
+- 更新domain-recipes.ts，只保留general和cr-processing配方
+- 更新requirement-analyzer.ts，移除旧域检测
+- 更新所有测试文件，统一使用核心工作域
+
+### 📊 统计
+
+- 删除1732行代码
+- 删除2个空目录
+- 删除2个测试文件
+- 专注于2个核心工作域：general和cr-processing
+
+### ✨ 核心功能保留
+
+- ✅ 11个智能体框架
+- ✅ 4层代码修改网关
+- ✅ 持久化审计系统
+- ✅ 测试强制执行
+- ✅ OpenCode日志集成
+- ✅ 通用编程（general域）
+- ✅ 变更请求处理（cr-processing域）
+
+---
+
 ## [3.0.0] - 2026-03-16
 
 ### 🎉 生产就绪
