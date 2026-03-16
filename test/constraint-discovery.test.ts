@@ -132,7 +132,7 @@ describe("约束发现系统", () => {
     it("应该找到约束目录中的所有文件", () => {
       // 创建测试目录结构
       const constraintsDir = path.join(testRoot, ".opencode", "constraints")
-      const domainsDir = path.join(constraintsDir, "domains", "asset-management")
+      const domainsDir = path.join(constraintsDir, "domains", "general")
       const agentsDir = path.join(constraintsDir, "agents")
 
       fs.mkdirSync(domainsDir, { recursive: true })
@@ -248,7 +248,7 @@ describe("约束注入集成", () => {
   it("应该将发现的约束注入到 system prompt", () => {
     const discoveredConstraints = [
       { name: "全局约束1", content: "内容1", source: "global.md", priority: "high" as const },
-      { name: "域约束1", content: "内容2", source: "domains/asset-management.md", priority: "high" as const },
+      { name: "域约束1", content: "内容2", source: "domains/general.md", priority: "high" as const },
     ]
 
     // 生成注入文本

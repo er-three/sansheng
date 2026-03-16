@@ -11,7 +11,7 @@
 import { getDomainRecipes } from "./domain-recipes.js"
 
 export interface RequirementAnalysis {
-  domain: "general" | "cr-processing" | "asset-management" | "reverse-engineering"
+  domain: "general" | "cr-processing"
   recipeName: string
   complexity: "simple" | "medium" | "complex" | "high_risk"
   riskLevel: "低" | "中" | "中-高" | "高"
@@ -59,7 +59,7 @@ export function analyzeRequirement(userInput: string): RequirementAnalysis {
  * 识别域（domain）
  */
 function identifyDomain(input: string): {
-  domain: "general" | "cr-processing" | "asset-management" | "reverse-engineering"
+  domain: "general" | "cr-processing"
   reasoning: string[]
 } {
   const reasoning: string[] = []
@@ -77,35 +77,8 @@ function identifyDomain(input: string): {
     return { domain: "cr-processing", reasoning }
   }
 
-  // 资产提取相关
-  if (
-    input.includes("提取") ||
-    input.includes("资产") ||
-    input.includes("extract") ||
-    input.includes("asset") ||
-    input.includes("迁移评估") ||
-    input.includes("代码索引")
-  ) {
-    reasoning.push("检测到资产提取关键词 → asset-management 域")
-    return { domain: "asset-management", reasoning }
-  }
-
-  // 逆向工程相关
-  if (
-    input.includes("迁移") ||
-    input.includes("逆向") ||
-    input.includes("ionic") ||
-    input.includes("angular") ||
-    input.includes("vue") ||
-    input.includes("react") ||
-    input.includes("改造")
-  ) {
-    reasoning.push("检测到迁移/逆向工程关键词 → reverse-engineering 域")
-    return { domain: "reverse-engineering", reasoning }
-  }
-
   // 默认：通用编程
-  reasoning.push("未检测到特定域关键词 → general 域（通用编程）")
+  reasoning.push("检测为通用编程任务 → general 域")
   return { domain: "general", reasoning }
 }
 
@@ -246,7 +219,7 @@ function assessComplexity(input: string): {
  * 推荐配方
  */
 function recommendRecipe(
-  domain: "general" | "cr-processing" | "asset-management" | "reverse-engineering",
+  domain: "general" | "cr-processing",
   complexity: "simple" | "medium" | "complex" | "high_risk"
 ): { domain: string; recipeName: string } {
   const recipeMap: Record<string, Record<string, string>> = {
@@ -263,20 +236,6 @@ function recommendRecipe(
       medium: "standard",
       complex: "complete",
       high_risk: "complete"
-    },
-    // asset-management 域
-    "asset-management": {
-      simple: "quick",
-      medium: "standard",
-      complex: "complete",
-      high_risk: "complete"
-    },
-    // reverse-engineering 域
-    "reverse-engineering": {
-      simple: "frontend_only",
-      medium: "standard",
-      complex: "full_stack",
-      high_risk: "high_risk"
     }
   }
 
@@ -300,19 +259,7 @@ function estimateCost(recommendation: {
     // cr-processing
     "cr-processing/hotfix": { tokens: "~90K", duration: "5分钟" },
     "cr-processing/standard": { tokens: "~140K", duration: "12分钟" },
-    "cr-processing/complete": { tokens: "~200K", duration: "20分钟" },
-
-    // asset-management
-    "asset-management/quick": { tokens: "~55K", duration: "5分钟" },
-    "asset-management/standard": { tokens: "~125K", duration: "15分钟" },
-    "asset-management/complete": { tokens: "~175K", duration: "25分钟" },
-
-    // reverse-engineering
-    "reverse-engineering/frontend_only": { tokens: "~90K", duration: "5分钟" },
-    "reverse-engineering/migration": { tokens: "~110K", duration: "10分钟" },
-    "reverse-engineering/standard": { tokens: "~135K", duration: "12分钟" },
-    "reverse-engineering/full_stack": { tokens: "~200K", duration: "20分钟" },
-    "reverse-engineering/high_risk": { tokens: "~225K", duration: "25分钟" }
+    "cr-processing/complete": { tokens: "~200K", duration: "20分钟" }
   }
 
   const key = `${recommendation.domain}/${recommendation.recipeName}`

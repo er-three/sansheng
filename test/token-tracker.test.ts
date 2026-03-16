@@ -104,12 +104,12 @@ describe("Token 消耗监控", () => {
 
     it("应该按 Domain 分组", () => {
       tracker.recordUsage(TokenCategory.CONSTRAINTS, 5000, undefined, "general")
-      tracker.recordUsage(TokenCategory.CONSTRAINTS, 3000, undefined, "asset-management")
+      tracker.recordUsage(TokenCategory.CONSTRAINTS, 3000, undefined, "general")
       tracker.recordUsage(TokenCategory.CONSTRAINTS, 2000, undefined, "general")
 
       const byDomain = tracker.getByDomain()
       assert.strictEqual(byDomain.get("general"), 7000)
-      assert.strictEqual(byDomain.get("asset-management"), 3000)
+      assert.strictEqual(byDomain.get("general"), 3000)
     })
 
     it("应该清除历史数据", () => {

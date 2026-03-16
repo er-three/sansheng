@@ -300,9 +300,7 @@ ID: ${task.id}
 
             const domainName = {
               "general": "General",
-              "cr-processing": "CRProcessing",
-              "asset-management": "AssetManagement",
-              "reverse-engineering": "ReverseEngineering"
+              "cr-processing": "CRProcessing"
             }[analysis.domain] || "General"
 
             return `
@@ -343,19 +341,7 @@ ${report}
    ├─ standard (5 步)  - 标准流程 (12min, ~140K token)
    └─ complete (8 步)  - 完整版本 (20min, ~200K token)
 
-3. asset-management - 资产提取和管理
-   ├─ quick (4 步)     - 快速提取 (5min, ~55K token)
-   ├─ standard (8 步)  - 标准提取 (15min, ~125K token)
-   └─ complete (10 步) - 完整提取 (25min, ~175K token)
-
-4. reverse-engineering - 逆向工程和迁移
-   ├─ frontend-only (6 步)  - 前端专用 (5min, ~90K token)
-   ├─ migration (6 步)      - 快速迁移 (10min, ~110K token)
-   ├─ standard (7 步)       - 标准迁移 (12min, ~135K token)
-   ├─ full-stack (10 步)    - 完整系统 (20min, ~200K token)
-   └─ high-risk (12 步)     - 高风险系统 (25min, ~225K token)
-
-总计：4 个域 × 平均 5 个配方 = 20 个工作流模式可选
+总计：2 个域 × 3-5 个配方 = 8 个工作流模式可选
 
 使用：@selectDomain 选择你需要的域和配方
 `.trim()
@@ -386,34 +372,12 @@ ${report}
   标准 CR：   "standard"  - 正常变更 (12min, ~140K token)
   完整版本：  "complete"  - 重大变更 (20min, ~200K token)
 
-【资产管理（asset-management）】
-  @initAssetManagementWorkflow
-
-  快速提取：  "quick"     - 仅核心资产 (5min, ~55K token)
-  标准提取：  "standard"  - 完整资产 (15min, ~125K token)
-  完整提取：  "complete"  - 强化检查 (25min, ~175K token)
-
-【逆向工程（reverse-engineering）】
-  @initReverseEngineeringWorkflow
-
-  前端专用：  "frontend_only" - 展示组件 (5min, ~90K token)
-  标准迁移：  "standard"      - 完整迁移 (12min, ~135K token)
-  快速迁移：  "migration"     - 有测试项目 (10min, ~110K token)
-  完整系统：  "full_stack"    - 复杂系统 (20min, ~200K token)
-  高风险系统："high_risk"     - 关键应用 (25min, ~225K token)
-
 使用示例：
   修复简单 bug：
   "我要修复一个 bug，用通用编程的 quick_fix 模式"
 
   线上紧急修复：
   "线上 bug，用 cr-processing 的 hotfix 模式"
-
-  资产快速提取：
-  "我想要快速提取资产，用 asset-management 的 quick 模式"
-
-  Ionic 迁移：
-  "迁移 Ionic 应用，用 reverse-engineering 的 standard 模式"
 `.trim()
         }
       }),

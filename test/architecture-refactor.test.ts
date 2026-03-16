@@ -104,7 +104,7 @@ describe('Architecture Refactor - New System', () => {
       const definition: WorkflowDefinition = {
         sessionId: 'test-session-1',
         intent: 'test workflow',
-        domain: 'asset-management'
+        domain: 'general'
       }
 
       const result = await executeWorkflow(definition)
@@ -210,7 +210,7 @@ describe('Architecture Refactor - New System', () => {
       const definition: WorkflowDefinition = {
         sessionId: 'integration-test-' + Date.now(),
         intent: 'Test complete workflow',
-        domain: 'asset-management',
+        domain: 'general',
         variables: {
           module_name: 'test-module',
           asset_type: 'service'

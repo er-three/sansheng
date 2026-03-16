@@ -358,7 +358,7 @@ describe("多层缓存架构", () => {
   describe("缓存预热 (CacheWarmer)", () => {
     it("应该预热约束缓存", () => {
       const cache = new MultiLayerCache<any>()
-      const domains = ["general", "asset-management"]
+      const domains = ["general", "general"]
       const agents = ["yibu", "gongbu"]
 
       CacheWarmer.warmupConstraintCache(cache, domains, agents)

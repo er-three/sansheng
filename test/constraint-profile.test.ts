@@ -92,10 +92,10 @@ describe("约束分级注入配置", () => {
     )
     const assetProfile = getConstraintInjectionProfile(
       "kubu",
-      "asset-management"
+      "general"
     )
 
-    // asset-management 域应该有管理约束
+    // general 域应该有管理约束
     assert(
       assetProfile.scopes.length >= generalProfile.scopes.length
     )

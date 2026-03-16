@@ -198,11 +198,6 @@ export function getConstraintInjectionProfile(
   // 合并约束（去重）
   const allScopes = Array.from(new Set([...baseScopes, ...agentScopes]))
 
-  // 根据 domain 额外添加约束
-  if (domain === "asset-management" && !allScopes.includes(ConstraintScope.MANAGEMENT)) {
-    allScopes.push(ConstraintScope.MANAGEMENT)
-  }
-
   // 确定优先级
   const priority = calculatePriority(agentName, domain)
 
@@ -280,7 +275,7 @@ export function generateConstraintProfileReport(): string {
     "kubu",
     "libu",
   ]
-  const domains = ["general", "asset-management"]
+  const domains = ["general", "cr-processing"]
 
   const lines: string[] = [
     "## 约束注入配置报告",
