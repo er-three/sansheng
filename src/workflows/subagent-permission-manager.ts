@@ -17,76 +17,43 @@ export interface SubagentPolicy {
 }
 
 /**
- * 定义所有Agent的SubAgent调用权限
+ * 权限配置 - 紧凑格式
  *
  * 原则：
- * - 战略层Agent（皇帝）：可以调用三省
- * - 执行层Agent（三省六部）：权限有限
- * - 工作层Agent（六部）：通常不调用其他SubAgent
+ * - 战略层（皇帝）：可以调用三省
+ * - 执行层（三省）：权限有限
+ * - 工作层（六部）：通常不调用SubAgent
  */
-export const SUBAGENT_POLICIES: SubagentPolicy[] = [
-  {
-    agentName: 'huangdi', // 皇帝
-    can_call_subagent: true,
-    subagents_allowed: ['zhongshu', 'menxia', 'shangshu'],  // 不能直接调用yushitai（御史台是尚书省专用）
-  },
-  {
-    agentName: 'zhongshu', // 中书省
-    can_call_subagent: true,
-    subagents_allowed: ['menxia'],
-  },
-  {
-    agentName: 'menxia', // 门下省
-    can_call_subagent: false,
-    subagents_allowed: [],
-  },
-  {
-    agentName: 'shangshu', // 尚书省
-    can_call_subagent: false,  // 尚书省使用 task() 工具调用六部和御史台，不使用 call_subagent
-    subagents_allowed: [],
-  },
-  {
-    agentName: 'yushitai', // 御史台
-    can_call_subagent: false,
-    subagents_allowed: [],
-  },
-  // 六部：执行层，一般不调用SubAgent
-  {
-    agentName: 'gongbu', // 工部
-    can_call_subagent: false,
-    subagents_allowed: [],
-  },
-  {
-    agentName: 'libu', // 礼部
-    can_call_subagent: false,
-    subagents_allowed: [],
-  },
-  {
-    agentName: 'yibu', // 吏部
-    can_call_subagent: false,
-    subagents_allowed: [],
-  },
-  {
-    agentName: 'hubu', // 户部
-    can_call_subagent: false,
-    subagents_allowed: [],
-  },
-  {
-    agentName: 'bingbu', // 兵部
-    can_call_subagent: false,
-    subagents_allowed: [],
-  },
-  {
-    agentName: 'xingbu', // 刑部
-    can_call_subagent: false,
-    subagents_allowed: [],
-  },
-  {
-    agentName: 'kubu', // 库部
-    can_call_subagent: false,
-    subagents_allowed: [],
-  },
-]
+const POLICIES_CONFIG: Record<string, { can_call: boolean; allowed?: string[] }> = {
+  // 战略层
+  huangdi: { can_call: true, allowed: ['zhongshu', 'menxia', 'shangshu'] },
+
+  // 执行层（三省）
+  zhongshu: { can_call: true, allowed: ['menxia'] },
+  menxia: { can_call: false },
+  shangshu: { can_call: false },
+  yushitai: { can_call: false },
+
+  // 工作层（六部）
+  gongbu: { can_call: false },
+  libu: { can_call: false },
+  yibu: { can_call: false },
+  hubu: { can_call: false },
+  bingbu: { can_call: false },
+  xingbu: { can_call: false },
+  kubu: { can_call: false },
+}
+
+/**
+ * 转换为标准格式的策略数组
+ */
+export const SUBAGENT_POLICIES: SubagentPolicy[] = Object.entries(POLICIES_CONFIG).map(
+  ([agentName, config]) => ({
+    agentName,
+    can_call_subagent: config.can_call,
+    subagents_allowed: config.allowed || [],
+  })
+)
 
 /**
  * 策略查询优化：使用 Map 实现 O(1) 查找
