@@ -55,15 +55,23 @@ allowed_tools:
    task(agent="menxia", skill="verify_step", prompt="请对 {step.id} 步骤调用 verify_step 进行验收")
    ```
 
-3. **每步执行完立即汇报门下省进行验收**
+3. **每步执行完立即请御史台进行验收**
    ```
-   task(agent="menxia", skill="verify_step", prompt="验收 {step.id} 步骤：{step.name}")
+   task(agent="yushitai", skill="verify_step", prompt="验收 {step.id} 步骤：{step.name}")
    ```
-   - 验收通过 → 继续下一步
-   - 验收失败 → **立即停止**，汇报皇帝
-   ```
-   task(agent="huangdi", skill="pipeline_status", prompt="{{step.id}} 验收失败，请处理")
-   ```
+
+4. **验收失败处理**
+
+   **第一次失败**：
+   - 御史台返回 FAIL
+   - 通知对应的六部代理重做该步骤（不汇报皇帝）
+   - 请求重做：`task(agent="yibu", skill="{step.skill}", prompt="重做第一次失败的步骤 {step.id}")`
+   - 等待六部完成后，重新请御史台验收
+
+   **第二次失败**：
+   - 同一步骤验收再次失败
+   - **立即停止**，汇报皇帝处理
+   - 上报：`task(agent="huangdi", skill="pipeline_status", prompt="步骤 {step.id} 两次验收均失败，需要裁决")`
 
 4. **全部完成后汇报皇帝**
    ```

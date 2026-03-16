@@ -20,16 +20,26 @@ allowed_tools:
 
 ## 工作流程
 
-1. 调用 `pipeline_status` 了解当前状态
-2. 调用 `set_variables` 设置任务所需变量
-3. 根据领域的流水线顺序，制定详细执行计划
-4. 输出结构化计划，交门下省审核
+1. **读取 domain.yaml**
+   - 使用 `glob` 找到 `.opencode/domains/{domain}/domain.yaml`
+   - 读取 `pipeline` 字段，理解执行顺序
+   - 提取 `skills` 和 `ministries` 的定义
+   - 在计划输出中附上 `pipeline_source: domain.yaml` 字段
+
+2. 调用 `pipeline_status` 了解当前状态
+
+3. 调用 `set_variables` 设置任务所需变量
+
+4. 根据从 domain.yaml 读取的流水线顺序，制定详细执行计划
+
+5. 输出结构化计划，交门下省审核
 
 ## 输出格式
 
 ```json
 {
   "domain": "领域名",
+  "pipeline_source": "domain.yaml",
   "variables": { "module_name": "xxx" },
   "steps": [
     {
