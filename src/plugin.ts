@@ -53,6 +53,12 @@ import {
   SubagentCallContext,
 } from "./workflows/subagent-safety-guard.js"
 import {
+  canCallSubagent,
+  getAllowedSubagents,
+  generatePermissionDeniedError,
+  generateDirectCallError,
+} from "./workflows/subagent-permission-manager.js"
+import {
   getTaskQueue,
   claimTask,
   completeTask,
@@ -435,18 +441,34 @@ export async function toolExecuteAfterHook(input: Record<string, unknown>, outpu
     const sessionId = (input as any).sessionId || (input as any).session_id || "default"
     const agentName = (input as any).agent_name || "unknown"
 
-    // 检查 SubAgent 调用是否安全（防深度嵌套、循环）
+    // 检查 SubAgent 调用是否安全（防深度嵌套、循环、权限）
     // 提取 call_subagent 工具的信息
     const toolName = (input as any).name || (input as any).tool_name || skillName
     if (toolName && typeof toolName === 'string' && toolName.includes('subagent')) {
       const subagentName = (input as any).args?.subagent || (input as any).args?.name
 
       if (subagentName) {
+        // 🔐 权限检查1：Agent是否有权调用SubAgent？
+        if (!canCallSubagent(agentName)) {
+          throw new Error(
+            `[SUBAGENT PERMISSION] SubAgent 调用被拒绝\n\n` +
+            `${generatePermissionDeniedError(agentName)}`
+          )
+        }
+
+        // 🔐 权限检查2：Agent是否有权调用这个特定的SubAgent？
+        if (!canCallSubagent(agentName, subagentName)) {
+          throw new Error(
+            `[SUBAGENT PERMISSION] SubAgent 调用被拒绝\n\n` +
+            `${generatePermissionDeniedError(agentName, subagentName)}`
+          )
+        }
+
         // 从 context 中获取或创建调用上下文
         let context: SubagentCallContext = (input as any).context?.subagentContext ||
                                             createSubagentContext(MAX_SUBAGENT_DEPTH)
 
-        // 验证 SubAgent 调用是否安全
+        // 🔐 陷阱防护：验证 SubAgent 调用是否安全（深度+循环）
         const validation = validateSubagentCall(subagentName, context)
         if (!validation.allowed) {
           throw new Error(
@@ -459,9 +481,9 @@ export async function toolExecuteAfterHook(input: Record<string, unknown>, outpu
 
         // 更新上下文，传递给 SubAgent
         const newContext = pushSubagentContext(context, subagentName)
-        log("SubagentSafety",
-            `SubAgent 调用通过验证 [深度${newContext.depth}/${context.maxDepth}]: ${subagentName}`,
-            "debug")
+        log("SubagentControl",
+            `✅ SubAgent 调用通过全部检查 [权限+陷阱] [深度${newContext.depth}/${context.maxDepth}]: ${agentName} → ${subagentName}`,
+            "info")
       }
     }
 
