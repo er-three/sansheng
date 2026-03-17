@@ -8,14 +8,14 @@
 
 ```
 ExecutionLayer 任务失败
-      ↓
+      [down]
 [ErrorRecoveryHandler] 分析错误 → 选择恢复策略
-      ↓
+      [down]
 ├─ [RetryManager] 重试（指数退避）
 ├─ [RollbackManager] 回滚（恢复到检查点）
 ├─ [CircuitBreaker] 熔断（防止级联失败）
 └─ [RecoveryHandler] 执行恢复操作
-      ↓
+      [down]
 继续执行或中止工作流
 ```
 

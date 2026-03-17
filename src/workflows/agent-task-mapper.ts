@@ -121,7 +121,7 @@ export function printAgentPermissions(): string {
   Object.entries(AGENT_TO_TASKS_MAPPING).forEach(([agent, tasks]) => {
     lines.push(`\n${getAgentChineseName(agent)}:`)
     tasks.forEach(task => {
-      lines.push(`  ✓ ${task}`)
+      lines.push(`  [PASS] ${task}`)
     })
   })
 

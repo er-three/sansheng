@@ -122,7 +122,7 @@ export function generateRetryReport(sessionId: string): string {
     "Task Retry Report",
     "═══════════════════════════════════════════",
     "",
-    `📊 Summary`,
+    `[chart] Summary`,
     `  - Total Retry Records: ${allRetries.length}`,
     `  - Pending Retry: ${pendingRetries.length}`,
     `  - Max Exceeded: ${exceeded.length}`,
@@ -139,7 +139,7 @@ export function generateRetryReport(sessionId: string): string {
   }
 
   if (exceeded.length > 0) {
-    lines.push("❌ Max Retries Exceeded")
+    lines.push("[NO] Max Retries Exceeded")
     exceeded.forEach(r => {
       lines.push(`  - ${r.taskId}: ${r.retryCount} attempts`)
       r.errors.forEach((e, i) => {

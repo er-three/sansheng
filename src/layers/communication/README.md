@@ -8,15 +8,15 @@
 
 ```
 ExecutionLayer 完成任务
-      ↓
+      [down]
 [EventEmitter] 发射事件 (task-completed)
-      ↓
+      [down]
 [MessageQueue] 入队 → 去重 → 优先级排序
-      ↓
+      [down]
 [AgentNotifier] 向 Agent 发送任务通知
-      ↓
+      [down]
 [NotificationManager] 管理重试 → 失败告警
-      ↓
+      [down]
 系统内其他层捕获事件 → ObservabilityLayer 记录
 ```
 

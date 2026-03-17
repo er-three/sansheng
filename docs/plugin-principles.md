@@ -139,7 +139,7 @@ export type AgentConfig = {
     prompt?: string                     // 系统提示词
 
     // Agent 角色
-    mode?: "subagent" | "primary" | "all"  // ✨ 关键字段
+    mode?: "subagent" | "primary" | "all"  // [sparkles] 关键字段
 
     // Agent 能力
     tools?: {
@@ -216,21 +216,21 @@ export function analyzerAgent(): AgentConfig {
 
 ```
 OpenCode 启动
-    ↓
+    [down]
 加载 package.json 中声明的 plugins
-    ↓
+    [down]
 对每个 plugin，调用其导出的 Plugin 函数，传入 PluginInput
-    ↓
+    [down]
 Plugin 函数返回 Hooks 对象
-    ↓
+    [down]
 OpenCode 检查 Hooks 中是否有 config Hook
-    ↓
+    [down]
 如果有，调用 config(config) Hook，传入当前的 Config 对象
-    ↓
+    [down]
 Plugin 修改 config.agent、config.provider、config.model 等
-    ↓
+    [down]
 OpenCode 使用修改后的 Config 继续初始化
-    ↓
+    [down]
 新的 Agent 在 UI 中可用
 ```
 
@@ -281,11 +281,11 @@ export const MyPlugin: Plugin = async (_input) => {
 
 ### 为什么要用 config Hook？
 
-**❌ 旧方式（不推荐）：**
+**[NO] 旧方式（不推荐）：**
 - 生成 markdown 文件到 `.opencode/agents/`
 - 问题：污染用户项目、难以版本控制、不能动态调整
 
-**✅ 新方式（推荐）：**
+**[OK] 新方式（推荐）：**
 - 用 TypeScript 定义 Agent 配置
 - 在 `config` Hook 中注册
 - 优点：类型安全、易于版本控制、可以动态条件判断
@@ -357,23 +357,23 @@ export default async function myPlugin(_input: PluginInput): Promise<Hooks> {
 
 ```
 Plugin 是一个异步函数，返回 Hooks 对象
-    ↓
+    [down]
 config Hook 是 Plugin 最重要的部分
-    ↓
+    [down]
 在 config Hook 中，修改 Config 对象来注册 Agent
-    ↓
+    [down]
 Agent 本身是 AgentConfig 对象，定义在 config Hook 中
 ```
 
 ### 为什么 test 项目把 Agent 分离为单独函数？
 
 ```typescript
-// ✅ 好的做法：Agent 配置作为函数
+// [OK] 好的做法：Agent 配置作为函数
 export function primaryAgent(): AgentConfig {
   return { /* ... */ }
 }
 
-// ❌ 不好的做法：Agent 配置硬编码在 config Hook 中
+// [NO] 不好的做法：Agent 配置硬编码在 config Hook 中
 async config(config) {
   config.agent["my-agent"] = {
     // ... 冗长的配置代码 ...
@@ -395,10 +395,10 @@ async config(config) {
 
 ```
 Layer 1: Plugin（函数）
-  ↓ 返回
+  [down] 返回
 Layer 2: Hooks（对象）
   ├─ config Hook（function）
-  │    ↓ 修改
+  │    [down] 修改
   └─→ Layer 3: Config（object）
          ├─ agent（AgentConfig[]）← Agent 就在这里
          ├─ provider（ProviderConfig[]）

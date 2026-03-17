@@ -55,7 +55,7 @@ export function generateAnalyticsReport(sessionId: string): string {
     "Workflow Analytics Report",
     "═══════════════════════════════════════════",
     "",
-    `📊 Task Metrics`,
+    `[chart] Task Metrics`,
     `  - Total Tasks: ${metrics.totalTasks}`,
     `  - Completed: ${metrics.completedTasks}`,
     `  - Failed: ${metrics.failedTasks}`,

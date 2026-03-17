@@ -24,7 +24,7 @@ test/governance/
 | e2e.test.ts | 12 | 完整工作流场景、并行执行、多部门分工 |
 | **总计** | **36** | **单元、集成、端到端** |
 
-**测试结果**: ✅ 全部通过（36/36）
+**测试结果**: [OK] 全部通过（36/36）
 
 ## 运行测试
 
@@ -66,9 +66,9 @@ npm run test:coverage -- test/governance/
 ### 1. 类型定义测试 (`types.test.ts`)
 
 **覆盖范围**:
-- ✅ 所有枚举值的定义
-- ✅ 核心类型的创建和验证
-- ✅ Plan、Step、Task 的结构验证
+- [OK] 所有枚举值的定义
+- [OK] 核心类型的创建和验证
+- [OK] Plan、Step、Task 的结构验证
 
 **示例测试**:
 ```typescript
@@ -91,15 +91,15 @@ it("should create a valid Step with uses field", () => {
 ### 2. 执行引擎测试 (`execution-engine.test.ts`)
 
 **WorkflowEngine 测试**:
-- ✅ 初始化和状态管理
-- ✅ 可执行步骤的识别
-- ✅ 任务的创建
+- [OK] 初始化和状态管理
+- [OK] 可执行步骤的识别
+- [OK] 任务的创建
 
 **DependencyResolver 测试**:
-- ✅ 循环依赖检测
-- ✅ 关键路径计算
-- ✅ 传递依赖计算
-- ✅ 拓扑排序
+- [OK] 循环依赖检测
+- [OK] 关键路径计算
+- [OK] 传递依赖计算
+- [OK] 拓扑排序
 
 **示例测试**:
 ```typescript
@@ -112,20 +112,20 @@ it("should detect cyclic dependencies", () => {
 ### 3. 协调器测试 (`orchestrator.test.ts`)
 
 **GovernanceOrchestrator 测试**:
-- ✅ 计划验证
-- ✅ 阶段2审核（拒绝循环依赖）
-- ✅ 阶段2审核（批准有效计划）
-- ✅ 关键路径获取
+- [OK] 计划验证
+- [OK] 阶段2审核（拒绝循环依赖）
+- [OK] 阶段2审核（批准有效计划）
+- [OK] 关键路径获取
 
 **MinistryDispatcher 测试**:
-- ✅ 部门映射
-- ✅ 部门描述生成
-- ✅ 任务提示生成
+- [OK] 部门映射
+- [OK] 部门描述生成
+- [OK] 任务提示生成
 
 **WorkflowStateManager 测试**:
-- ✅ 状态保存和检索
-- ✅ 状态清除
-- ✅ 全量状态获取
+- [OK] 状态保存和检索
+- [OK] 状态清除
+- [OK] 全量状态获取
 
 **示例测试**:
 ```typescript
@@ -149,7 +149,7 @@ it("should approve valid plans in review phase", async () => {
 ┌─ 代码扫描
 ├─ 依赖研究
 └─ 旧代码测试
-      ↓
+      [down]
    实现新功能
 ```
 

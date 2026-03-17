@@ -1,0 +1,45 @@
+name: general
+description: 通用编程域，处理不属于其他专用域的任务：bug修复、功能开发、代码重构、问题排查等
+version: 1.0.0
+
+# ─────────────────── 全局约束 ───────────────────
+constraints:
+  - "禁止省略输出，必须完整展示每个步骤的结果"
+  - "遇到错误只重试一次，失败则报错退出，禁止跳过"
+  - "代码变更必须通过测试才算完成"
+  - "生成内容必须立即落盘，返回文件路径后结束，禁止只展示在对话框"
+
+# ─────────────────── 流水线定义 ───────────────────
+pipeline:
+  # 【Level 1：步骤一】任务分析
+  - id: analyze
+    name: 任务分析
+    description: 扫描相关代码，理解现有结构和需求，输出分析报告
+    skill: analyze
+    uses: [yibu, hubu]
+    depends_on: []
+
+  # 【Level 1：步骤二】代码实现
+  - id: implement
+    name: 代码实现
+    description: 按分析报告实现代码变更，执行构建验证
+    skill: implement
+    uses: [gongbu, bingbu]
+    depends_on: [analyze]
+
+  # 【Level 1：步骤三】测试验证
+  - id: verify
+    name: 测试验证
+    description: 代码审查 + 运行测试，确保质量
+    skill: verify
+    uses: [xingbu, bingbu]
+    depends_on: [implement]
+
+# ─────────────────── 变量配置 ───────────────────
+variables:
+  - name: task_description
+    description: 任务描述（bug修复/功能/重构等），可选
+    required: false
+  - name: task_priority
+    description: 优先级（high/medium/low）
+    required: false

@@ -449,4 +449,4 @@ describe("Token 消耗监控", () => {
   })
 })
 
-console.log("\n✅ Token 消耗监控测试全部通过！")
+console.log("\n[OK] Token 消耗监控测试全部通过！")

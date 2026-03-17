@@ -19,7 +19,7 @@ pipeline:
     uses: [yibu, hubu]  # Level 2：代理并行
     depends_on: []
 
-    # ✅ 成功标识（Level 1）
+    # [OK] 成功标识（Level 1）
     success_criteria:
       - type: file_exists
         path: task-analysis.md
@@ -38,7 +38,7 @@ pipeline:
       - type: agent_all_done
         error_msg: "不是所有代理都完成了（Level 2）"
 
-    # ❌ 失败标识（Level 1）
+    # [NO] 失败标识（Level 1）
     failure_criteria:
       - type: timeout
         max_seconds: 600
@@ -57,7 +57,7 @@ pipeline:
     uses: [gongbu, bingbu]  # Level 2：代理并行
     depends_on: [analyze]   # 依赖前一步
 
-    # ✅ 成功标识（Level 1）
+    # [OK] 成功标识（Level 1）
     success_criteria:
       # 文件修改输出验证
       - type: file_exists
@@ -84,7 +84,7 @@ pipeline:
         keywords: ["FAIL", "failed file"]
         error_msg: "有文件修改失败（Level 3）"
 
-    # ❌ 失败标识（Level 1）
+    # [NO] 失败标识（Level 1）
     failure_criteria:
       - type: timeout
         max_seconds: 1200
@@ -106,7 +106,7 @@ pipeline:
     uses: [xingbu, bingbu]  # Level 2：代理并行
     depends_on: [implement]
 
-    # ✅ 成功标识（Level 1）
+    # [OK] 成功标识（Level 1）
     success_criteria:
       # 审查报告
       - type: file_exists
@@ -130,7 +130,7 @@ pipeline:
         keywords: ["CRITICAL", "FAILED"]
         error_msg: "代码审查发现关键问题"
 
-    # ❌ 失败标识（Level 1）
+    # [NO] 失败标识（Level 1）
     failure_criteria:
       - type: timeout
         max_seconds: 600
@@ -152,7 +152,7 @@ variables:
 # ─────────────────── 完整的验证流程说明 ───────────────────
 verification_flow:
   level_1_step_verification: |
-    ✅ Level 1 验证流程（步骤成功/失败）
+    [OK] Level 1 验证流程（步骤成功/失败）
 
     对每个步骤执行完成后：
     1. 检查所有 success_criteria
@@ -166,7 +166,7 @@ verification_flow:
     - halt: 停止流水线，报错退出
 
   level_2_agent_verification: |
-    ✅ Level 2 验证流程（代理成功/失败）
+    [OK] Level 2 验证流程（代理成功/失败）
 
     对每个步骤的并行代理：
     1. 同时调用所有代理
@@ -178,7 +178,7 @@ verification_flow:
     4. 触发 Level 1 的成功条件检查
 
   level_3_subtask_verification: |
-    ✅ Level 3 验证流程（子任务成功/失败）
+    [OK] Level 3 验证流程（子任务成功/失败）
 
     对 gongbu agent 的文件修改：
     1. 自动分析文件依赖关系
@@ -199,19 +199,19 @@ example_flow: |
 
   用户: /start 修复表单验证 bug
 
-  ↓ Level 1: analyze 步骤
+  [down] Level 1: analyze 步骤
   ├─ Level 2: yibu + hubu 并行执行
   │  ├─ yibu: 扫描本地代码 → status: done
   │  └─ hubu: 搜索文档 → status: done
   ├─ 检查 Level 1 成功条件
-  │  ├─ ✅ task-analysis.md 存在
-  │  ├─ ✅ 文件非空
-  │  ├─ ✅ 大小 > 100 bytes
-  │  ├─ ✅ 无错误关键字
-  │  └─ ✅ 所有代理完成
+  │  ├─ [OK] task-analysis.md 存在
+  │  ├─ [OK] 文件非空
+  │  ├─ [OK] 大小 > 100 bytes
+  │  ├─ [OK] 无错误关键字
+  │  └─ [OK] 所有代理完成
   ├─ 结果: SUCCESS → 进入下一步
 
-  ↓ Level 1: implement 步骤
+  [down] Level 1: implement 步骤
   ├─ Level 2: gongbu + bingbu 并行执行
   │  ├─ gongbu: 修改 3 个页面
   │  │  ├─ Level 3: 自动检测依赖
@@ -220,23 +220,23 @@ example_flow: |
   │  │  └─ 返回 GongbuParallelResult (status: PASS)
   │  └─ bingbu: 执行编译 → status: done
   ├─ 检查 Level 1 成功条件
-  │  ├─ ✅ implementation-report.md 存在
-  │  ├─ ✅ 文件非空
-  │  ├─ ✅ 无编译错误
-  │  └─ ✅ Level 3 子任务全部通过
+  │  ├─ [OK] implementation-report.md 存在
+  │  ├─ [OK] 文件非空
+  │  ├─ [OK] 无编译错误
+  │  └─ [OK] Level 3 子任务全部通过
   ├─ 结果: SUCCESS → 进入下一步
 
-  ↓ Level 1: verify 步骤
+  [down] Level 1: verify 步骤
   ├─ Level 2: xingbu + bingbu 并行执行
   │  ├─ xingbu: 代码审查 → status: done
   │  └─ bingbu: 运行测试 → status: done
   ├─ 检查 Level 1 成功条件
-  │  ├─ ✅ code-review.md 存在
-  │  ├─ ✅ test-results.json 存在
-  │  ├─ ✅ 所有测试通过
-  │  └─ ✅ 无代码审查问题
+  │  ├─ [OK] code-review.md 存在
+  │  ├─ [OK] test-results.json 存在
+  │  ├─ [OK] 所有测试通过
+  │  └─ [OK] 无代码审查问题
   ├─ 结果: SUCCESS
 
-  ↓ 流水线完成 ✅
+  [down] 流水线完成 [OK]
   总耗时: 4 分钟（vs 12 分钟无并行）
   加速比: 3.0x (Level 2) × 3.0x (Level 3) = 综合效果明显

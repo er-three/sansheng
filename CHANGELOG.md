@@ -6,9 +6,39 @@
 
 ---
 
+## [3.1.2] - 2026-03-18
+
+### [CLEAN] 清除所有emoji符号
+
+**背景**：
+项目文档和代码中包含大量emoji符号（✅❌✓⚠️等），这些符号在某些编辑器、CI/CD系统或不同操作系统间的表现不一致，容易引起显示问题或编码冲突。
+
+### [DELETE] 清理内容
+
+- 删除所有状态emoji：✅❌✓⚠️等，改用文本标记 [OK]/[NO]/[PASS]/[WARN]
+- 删除所有装饰emoji：🚨🎯🗑️🏗️等，改用文本标记 [ALERT]/[TARGET]/[DELETE]/[ARCHITECTURE]
+- 删除编号emoji：1️⃣-🔟，改用纯数字标记 [1]-[10]
+- 删除其他特殊符号：↓⬇️▪️📝等
+
+### [OK] 处理范围
+
+- src/agents/: 4个Agent配置文件（shangshu, zhongshu, huangdi, menxia）
+- .opencode/agents/: 4个Markdown配置文件（shangshu.md, huangdi.md, yushitai.md, gongbu.md）
+- docs/: 所有文档文件（architecture.md, governance-system.md等）
+- 配置文件: CHANGELOG.md, README.md, domain.yaml等
+
+### [YES] 验证结果
+
+- [OK] 编译成功：npm run build 无错误
+- [OK] 所有35+个文件处理完成
+- [OK] 无残留emoji符号
+- [OK] 功能无变化，仅文本替换
+
+---
+
 ## [3.1.1] - 2026-03-17
 
-### 🔒 权限矩阵强制执行 (Security Hardening)
+### [lock] 权限矩阵强制执行 (Security Hardening)
 
 **背景**：
 之前的权限配置虽然定义了 `edit: deny` 和 `bash: deny`，但缺少 `write: deny` 限制。这导致任何agent都可以通过 write 工具绕过权限检查，直接修改代码文件。大型模型（如minimax）可能利用这一漏洞直接执行所有工作，绕过三省六部的分层调度机制。
@@ -16,32 +46,32 @@
 ### 🔐 权限强化清单
 
 #### 三省权限矩阵
-- **huangdi (皇帝)**：`edit: deny, write: deny, bash: deny` ✅
+- **huangdi (皇帝)**：`edit: deny, write: deny, bash: deny` [OK]
   - 只能决策和调度，不能执行代码
-- **zhongshu (中书省)**：`edit: deny, write: deny, bash: deny` ✅
+- **zhongshu (中书省)**：`edit: deny, write: deny, bash: deny` [OK]
   - 只能规划，必须通过 call_subagent 调用其他agent
-- **menxia (门下省)**：`edit: deny, write: deny, bash: deny` ✅
+- **menxia (门下省)**：`edit: deny, write: deny, bash: deny` [OK]
   - 只能审核，必须通过 call_subagent 调用验证
-- **shangshu (尚书省)**：`edit: deny, write: deny, bash: deny, read: allow` ✅
+- **shangshu (尚书省)**：`edit: deny, write: deny, bash: deny, read: allow` [OK]
   - 执行协调者，只能通过 task() 调用六部，不能直接修改代码
 
 #### 六部权限矩阵
-- **吏部 (yibu)**：`edit: deny, write: deny, bash: deny, read: allow, glob: allow` ✅
-- **户部 (hubu)**：`edit: deny, write: deny, bash: deny, read: allow, glob: allow` ✅
-- **礼部 (libu)**：`edit: deny, write: deny, bash: deny, read: allow, glob: allow` ✅
-- **兵部 (bingbu)**：`edit: deny, write: deny, bash: allow` ✅
-- **刑部 (xingbu)**：`edit: deny, write: deny, bash: deny, read: allow, glob: allow` ✅
-- **工部 (gongbu)**：`edit: allow, write: allow, bash: deny, read: allow` ✅
+- **吏部 (yibu)**：`edit: deny, write: deny, bash: deny, read: allow, glob: allow` [OK]
+- **户部 (hubu)**：`edit: deny, write: deny, bash: deny, read: allow, glob: allow` [OK]
+- **礼部 (libu)**：`edit: deny, write: deny, bash: deny, read: allow, glob: allow` [OK]
+- **兵部 (bingbu)**：`edit: deny, write: deny, bash: allow` [OK]
+- **刑部 (xingbu)**：`edit: deny, write: deny, bash: deny, read: allow, glob: allow` [OK]
+- **工部 (gongbu)**：`edit: allow, write: allow, bash: deny, read: allow` [OK]
   - 唯一有文件修改权限的部门
 
-### ✅ 验证结果
+### [OK] 验证结果
 
-- ✅ 权限矩阵：9个agent完整覆盖，无遗漏
-- ✅ subagent调用方式：正确使用 task(agent="...") 而非 @agent 直接调用
-- ✅ 执行链路：huangdi → zhongshu/menxia/shangshu → 六部（gongbu修改）
-- ✅ 防护机制：非工部agent无法绕过write权限限制
+- [OK] 权限矩阵：9个agent完整覆盖，无遗漏
+- [OK] subagent调用方式：正确使用 task(agent="...") 而非 @agent 直接调用
+- [OK] 执行链路：huangdi → zhongshu/menxia/shangshu → 六部（gongbu修改）
+- [OK] 防护机制：非工部agent无法绕过write权限限制
 
-### 📝 相关文件
+### [note] 相关文件
 
 - `.opencode/agents/huangdi.md`
 - `.opencode/agents/zhongshu.md`
@@ -57,7 +87,7 @@
 
 这是一个重大功能发布，包含完整的三省六部多智能体协作框架的实现。
 
-### ✨ 新增功能
+### [sparkles] 新增功能
 
 #### 治理系统核心
 - **`src/governance/types.ts`** (330 行)
@@ -88,22 +118,22 @@
 - **troubleshooting.md** - 故障排除和常见问题解答
 - **examples.ts** - 6个完整工作流示例
 
-### 📊 统计
+### [chart] 统计
 
 - **代码量**：3,500+行
 - **测试**：36个（全部通过）
 - **文档**：6个新文档
 - **Git提交**：4个主要提交
-- **编译**：✅ TypeScript无错误
+- **编译**：[OK] TypeScript无错误
 
-### 🎯 核心特性
+### [TARGET] 核心特性
 
-- ✅ 5阶段工作流（规划→审核→执行→验证→批准）
-- ✅ 并行执行支持
-- ✅ 循环依赖检测
-- ✅ 关键路径分析
-- ✅ 自动重试和人工干预
-- ✅ 完整的执行追踪
+- [OK] 5阶段工作流（规划→审核→执行→验证→批准）
+- [OK] 并行执行支持
+- [OK] 循环依赖检测
+- [OK] 关键路径分析
+- [OK] 自动重试和人工干预
+- [OK] 完整的执行追踪
 
 ### 📚 文档改进
 
@@ -113,7 +143,7 @@
 - 新增故障排除指南
 - 新增测试指南
 
-### ⚡ 性能
+### [lightning] 性能
 
 - 支持多个步骤并行执行
 - 关键路径分析优化执行时间
@@ -121,9 +151,9 @@
 
 ### 🔄 向后兼容
 
-- ✅ 完全兼容之前的Agent框架
-- ✅ 保留所有现有功能
-- ✅ 只添加新功能，不改变现有API
+- [OK] 完全兼容之前的Agent框架
+- [OK] 保留所有现有功能
+- [OK] 只添加新功能，不改变现有API
 
 ---
 
@@ -133,36 +163,36 @@
 
 删除了资产整理、逆向工程和Agent流程优化相关功能，专注于核心编程能力。
 
-### 🗑️ 删除
+### [DELETE] 删除
 
 - **资产整理功能** (asset-management domain)
 - **逆向工程功能** (reverse-engineering domain)
 - **Agent优化模块** (src/agent/optimization.ts)
 - **相关测试文件** (agent-optimization.test.ts, token-consumption-validation.test.ts)
 
-### 📝 修改
+### [note] 修改
 
 - 更新README，简化工作域说明
 - 更新domain-recipes.ts，只保留general和cr-processing配方
 - 更新requirement-analyzer.ts，移除旧域检测
 - 更新所有测试文件，统一使用核心工作域
 
-### 📊 统计
+### [chart] 统计
 
 - 删除1732行代码
 - 删除2个空目录
 - 删除2个测试文件
 - 专注于2个核心工作域：general和cr-processing
 
-### ✨ 核心功能保留
+### [sparkles] 核心功能保留
 
-- ✅ 11个智能体框架
-- ✅ 4层代码修改网关
-- ✅ 持久化审计系统
-- ✅ 测试强制执行
-- ✅ OpenCode日志集成
-- ✅ 通用编程（general域）
-- ✅ 变更请求处理（cr-processing域）
+- [OK] 11个智能体框架
+- [OK] 4层代码修改网关
+- [OK] 持久化审计系统
+- [OK] 测试强制执行
+- [OK] OpenCode日志集成
+- [OK] 通用编程（general域）
+- [OK] 变更请求处理（cr-processing域）
 
 ---
 
@@ -172,7 +202,7 @@
 
 企业级多智能体协作框架正式发布，包含完整的4层验证、持久化审计和测试强制。
 
-### ✨ 新增
+### [sparkles] 新增
 
 #### Phase 3 - 系统硬化
 - **代码修改网关** (`src/workflows/code-modification-gateway.ts`)
@@ -212,7 +242,7 @@
 - 优化权限定义格式 - 从62行压缩到30行，保持功能不变
 - 改进code reuse和性能审计 - 移除重复代码、优化内存管理
 
-### 🏗️ 架构
+### [ARCHITECTURE] 架构
 
 完整的11个智能体分层架构：
 
@@ -262,14 +292,14 @@
 - log() - 标准日志输出
 - diagnoseLoggerStatus() - 诊断工具
 
-### ✅ 测试
+### [OK] 测试
 
 - 499+ 单元测试通过
 - 完整的功能测试覆盖
 - 集成场景验证
 - 性能基准测试
 
-### 🎯 核心特点
+### [TARGET] 核心特点
 
 - **11个智能体** - 分层架构，职责清晰
 - **4层验证网关** - 代码修改前自动检查
@@ -359,5 +389,5 @@ MIT
 
 **版本**: 3.1.1
 **发布日期**: 2026-03-17
-**状态**: ✅ 生产就绪 (权限矩阵强制执行完成)
+**状态**: [OK] 生产就绪 (权限矩阵强制执行完成)
 

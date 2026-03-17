@@ -108,8 +108,8 @@ agent_code_review:
     description: "严重问题必须修复"
     content: |
       按问题严重程度分类：
-      - 🔴 严重问题（安全、功能错误）：必须修复
-      - 🟡 中等问题（性能、可维护性）：应该修复
+      - [RED] 严重问题（安全、功能错误）：必须修复
+      - [YELLOW] 中等问题（性能、可维护性）：应该修复
       - 🟢 建议项（风格、最佳实践）：可选
       严重问题未修复禁止通过审查。
     priority: "high"
@@ -216,7 +216,7 @@ parallel_execution:
     content: |
       Level 3 并行中（代理内子任务）：
       - 返回的 parallel_subtasks 数组中每个子任务都要验证
-      - status 必须是 "✅ PASS"，不允许有失败
+      - status 必须是 "[OK] PASS"，不允许有失败
       - 任何子任务失败立即停止整个步骤
     priority: "high"
 

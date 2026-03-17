@@ -392,7 +392,7 @@ export function generateChancelleryReport(sessionId: string): string {
   - 状态: ${status.state}
   - 创建时间: ${new Date(status.createdAt).toISOString()}
 
-📊 进度统计
+[chart] 进度统计
   - 总任务数: ${status.totalTasks}
   - 已完成: ${status.completedTasks}
   - 失败: ${status.failedTasks}
@@ -404,7 +404,7 @@ export function generateChancelleryReport(sessionId: string): string {
     .join('\n') || '  无'}
 
 ${queue ? `
-📝 任务详情
+[note] 任务详情
 ${queue.tasks.map(t => `  [${t.status.toUpperCase()}] ${t.name} (${t.id})`).join('\n')}
 ` : ''}
   `

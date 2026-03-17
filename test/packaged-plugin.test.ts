@@ -214,7 +214,7 @@ describe("📦 Packaged Plugin - 实际功能测试", () => {
 
   // ─────────────────── 最终检查 ───────────────────
 
-  describe("✅ 打包完整性最终检查", () => {
+  describe("[OK] 打包完整性最终检查", () => {
     it("应该可以直接在 npm 上发布", async () => {
       const pkgPath = path.join(__dirname, "../package.json")
       const pkg = JSON.parse(fs.readFileSync(pkgPath, "utf-8"))
@@ -241,7 +241,7 @@ describe("📦 Packaged Plugin - 实际功能测试", () => {
         `版本号格式无效: ${pkg.version}`
       )
 
-      console.log(`✅ 包信息：${pkg.name}@${pkg.version}`)
+      console.log(`[OK] 包信息：${pkg.name}@${pkg.version}`)
     })
   })
 })

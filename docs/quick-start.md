@@ -133,7 +133,7 @@ set_variables({ module_name: "payment" })
 流程：
 ```
 皇帝 → 中书省规划 → 门下省审核 → 尚书省调度
-                              ↓
+                              [down]
              六部并行执行（scan → extract → mapping → behavior → detect → verify → persist）
 ```
 
@@ -151,7 +151,7 @@ cr-proposal → cr-specification → cr-implementation → cr-persist
 
 ---
 
-## 📊 关键数据
+## [chart] 关键数据
 
 | 指标 | 数值 |
 |------|------|
@@ -164,7 +164,7 @@ cr-proposal → cr-specification → cr-implementation → cr-persist
 
 ---
 
-## ✨ 特色功能
+## [sparkles] 特色功能
 
 ### 1. Hash-Anchored Edit
 编辑前自动验证 `old_string` 唯一性，成功率 99%+

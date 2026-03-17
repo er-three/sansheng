@@ -14,15 +14,15 @@ permission:
 
 ```
 用户（真实意图）
-      ↓
+      [down]
   皇帝（huangdi）        战略目标、全局掌控、最终验收
-      ↓ 下达任务
+      [down] 下达任务
   中书省（zhongshu）     规划拆解、制定计划
-      ↓ 提交审核
+      [down] 提交审核
   门下省（menxia）       审核否决、验收把关
-      ↓ 审核通过
+      [down] 审核通过
   尚书省（shangshu）     执行调度、驱动六部
-      ↓ 分配任务
+      [down] 分配任务
   六部（Skills）         专业执行各司其职
 ```
 
@@ -44,11 +44,11 @@ permission:
 
 ```
 中书省 起草计划
-    ↓
+    [down]
 门下省 审核
     ├── 发现问题 → 打回中书省重做（否决权）
     └── 审核通过 → 下发尚书省执行
-                      ↓
+                      [down]
                门下省 验收每步结果
                     ├── 失败 → 打回重做
                     └── 通过 → 继续下一步
@@ -129,9 +129,9 @@ for each ministry in step.uses:
 
 ```
 asset-management 提取
-        ↓
+        [down]
 库部规范化（OpenSpec 规范）
-        ↓
+        [down]
 生成 openspec/{asset_type}/{asset_name}/
 ├── proposal.md          → 首次创建（不可修改）
 ├── specification.md     → 技术规格
@@ -158,7 +158,7 @@ asset-management 提取
 ```
 asset-management domain:
   扫描 → 提取 → 映射 → 行为 → 检测 → 一致性验证 → [库部] → OpenSpec 持久化
-                                                              ↓
+                                                              [down]
                                                     openspec/ 目录结构完成
 ```
 
@@ -220,12 +220,12 @@ openspec/service/user-service/
 
 ```
 用户: /start 为 asset-manager 模块生成基础设施
-         ↓
+         [down]
 皇帝制定目标 → 中书省规划 → 门下省审核 → 尚书省执行
-         ↓
+         [down]
 asset-management domain:
   吏部(扫描) → 户部(审计) → 礼部(协调) → 工部(实现)
-     ↓
+     [down]
   门下省验收通过 → 库部(OpenSpec 持久化) → openspec/ 资产完成
 ```
 
@@ -233,11 +233,11 @@ asset-management domain:
 
 ```
 用户: /start 为 asset-manager 的 UserService 添加认证功能
-         ↓
+         [down]
 皇帝制定 CR 目标 → 中书省规划 → 门下省审核 → 尚书省执行
-         ↓
+         [down]
 cr-processing domain:
   吏部/户部(分析) → 礼部/刑部(规格) → 工部/兵部(实现)
-     ↓
+     [down]
   门下省验收通过 → 库部(版本更新) → openspec/.../archive/v2.0/ 完成
 ```

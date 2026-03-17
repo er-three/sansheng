@@ -2,7 +2,7 @@
 
 企业级多智能体协作框架，基于三省六部制设计。
 
-**最新版本**: 3.1.1 (2026-03-17) - ✅ 权限矩阵强制执行 + task()调用方式修正
+**最新版本**: 3.1.1 (2026-03-17) - [OK] 权限矩阵强制执行 + task()调用方式修正
 
 ---
 
@@ -67,15 +67,15 @@ npm install @deep-flux/liubu
 
 ```
 用户输入(/start)
-  ↓
+  [down]
 皇帝分析意图 → 选择工作域 → 分配任务给三省
-  ↓
+  [down]
 中书省制定计划
-  ↓
+  [down]
 门下省审核检查
-  ↓
+  [down]
 尚书省执行协调 → 调用六部完成
-  ↓
+  [down]
 结果验收
 ```
 
@@ -85,13 +85,13 @@ npm install @deep-flux/liubu
 
 框架支持两个核心工作域：
 
-### 1️⃣ General - 通用编程
+### [1] General - 通用编程
 用于标准的编程任务、bug修复和功能开发
 - **quick_fix** - 快速修复 (5分钟, ~70K token)
 - **standard** - 标准流程 (10分钟, ~120K token)
 - **comprehensive** - 强化审计 (15分钟, ~180K token)
 
-### 2️⃣ CR Processing - 变更请求处理
+### [2] CR Processing - 变更请求处理
 用于系统升级、API变更和版本更新
 - **hotfix** - 紧急修复 (5分钟, ~90K token)
 - **standard** - 标准CR流程 (12分钟, ~140K token)
@@ -343,9 +343,9 @@ A: 修复失败原因，调用 `@declare_test_result task_id passed`
 - **docs/index.md** - 📚 文档导航索引
 - **docs/quick-start.md** - 🚀 5分钟快速开始
 - **docs/agents.md** - 🤖 11个智能体详解
-- **docs/architecture.md** - 🏗️ 系统架构设计
+- **docs/architecture.md** - [ARCHITECTURE] 系统架构设计
 - **docs/phase-3.md** - ⚙️ Phase 3核心功能（网关、审计、测试强制）
-- **docs/opencode-logger.md** - 📝 日志系统说明
+- **docs/opencode-logger.md** - [note] 日志系统说明
 - **docs/plugin-principles.md** - 🔧 系统设计原则
 
 ---
@@ -356,7 +356,7 @@ MIT
 
 ---
 
-**当前版本**: 3.0.1 | **发布日期**: 2026-03-16 | **状态**: ✅ 生产就绪
+**当前版本**: 3.0.1 | **发布日期**: 2026-03-16 | **状态**: [OK] 生产就绪
 
 ### 版本3.0.1更新
 - 删除资产整理功能

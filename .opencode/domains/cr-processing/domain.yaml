@@ -29,7 +29,7 @@ pipeline:
     name: CR 版本归档
     description: 创建新版本 archive，更新 changelog，持久化完整变更历史
     skill: cr-persist
-    uses: [kubu]
+    uses: [gongbu]
 
 variables:
   - name: asset_type
