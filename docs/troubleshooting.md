@@ -2,7 +2,7 @@
 
 常见问题及解决方案。
 
-## 🔴 计划验证失败
+## [RED] 计划验证失败
 
 ### 错误：计划被拒绝 (Decision.ESCALATE)
 
@@ -16,14 +16,14 @@
 
 **解决方案**：
 ```typescript
-// ❌ 错误
+// [NO] 错误
 const step = {
   id: 'step-1',
   name: '代码扫描',
   // 缺少 uses 字段
 }
 
-// ✅ 正确
+// [OK] 正确
 const step = {
   id: 'step-1',
   name: '代码扫描',
@@ -41,14 +41,14 @@ const step = {
 
 **解决方案**：
 ```typescript
-// ❌ 错误
+// [NO] 错误
 const step = {
   id: 'step-2',
   name: '实现修复',
   acceptanceCriteria: {}  // 空的
 }
 
-// ✅ 正确
+// [OK] 正确
 const step = {
   id: 'step-2',
   name: '实现修复',
@@ -85,12 +85,12 @@ if (orchestrator.hasCyclicDependency(plan)) {
 **解决方案**：检查并修正依赖关系
 
 ```
-❌ 循环依赖：
+[NO] 循环依赖：
 Step 1 → Step 2
-   ↑        ↓
+   ↑        [down]
    └────────┘
 
-✅ 正确的依赖：
+[OK] 正确的依赖：
 Step 1 → Step 2 → Step 3
 ```
 
@@ -104,7 +104,7 @@ Step 1 → Step 2 → Step 3
 
 **解决方案**：
 ```typescript
-// ❌ 错误
+// [NO] 错误
 const steps = [
   {
     id: 'step-1',
@@ -118,7 +118,7 @@ const steps = [
   }
 ]
 
-// ✅ 正确
+// [OK] 正确
 const steps = [
   {
     id: 'step-1',
@@ -133,7 +133,7 @@ const steps = [
 ]
 ```
 
-## 🟡 执行失败
+## [YELLOW] 执行失败
 
 ### 问题：步骤执行失败，已重试但仍失败
 
@@ -146,9 +146,9 @@ Retry Count: 2 (max retries exceeded)
 
 ```
 执行失败
-  ↓
+  [down]
 第1次失败 → 自动重试
-  ↓
+  [down]
 第2次失败 → 上报皇帝（人工决策）
 ```
 
@@ -247,14 +247,14 @@ console.log('执行顺序:', executionOrder)
 
 1. **步骤有不必要的依赖**
    ```typescript
-   // ❌ 错误（不应该相互依赖）
+   // [NO] 错误（不应该相互依赖）
    const steps = [
      { id: 'step-1', dependencies: [] },
      { id: 'step-2', dependencies: ['step-1'] },  // 不必要
      { id: 'step-3', dependencies: ['step-2'] }   // 不必要
    ]
 
-   // ✅ 正确（可以并行）
+   // [OK] 正确（可以并行）
    const steps = [
      { id: 'step-1', dependencies: [] },
      { id: 'step-2', dependencies: [] },  // 无依赖
@@ -328,7 +328,7 @@ report.stepResults.forEach((result, stepId) => {
    }
    ```
 
-## 📊 监控和调试
+## [chart] 监控和调试
 
 ### 启用详细日志
 

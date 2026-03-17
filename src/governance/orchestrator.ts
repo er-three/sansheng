@@ -312,7 +312,7 @@ ${JSON.stringify(step.input, null, 2)}
 
 【验收标准】
 ${Object.entries(step.acceptanceCriteria)
-  .map(([key, value]) => `  ✓ ${key}: ${value}`)
+  .map(([key, value]) => `  [PASS] ${key}: ${value}`)
   .join("\n")}
 
 【涉及部门】

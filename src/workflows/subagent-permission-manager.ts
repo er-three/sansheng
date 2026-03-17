@@ -162,7 +162,7 @@ export function generatePermissionDeniedError(agentName: string, targetSubagent?
 
   if (!policy || !policy.can_call_subagent) {
     return (
-      `❌ Agent "${agentName}" 没有权限调用SubAgent\n\n` +
+      `[NO] Agent "${agentName}" 没有权限调用SubAgent\n\n` +
       `原因：${policy ? 'Agent被设计为只执行任务，不能委派给其他Agent' : '未知的Agent'}。\n\n` +
       `解决方案：\n` +
       `  1. 使用高级Agent（如皇帝、中书省）来协调\n` +
@@ -172,7 +172,7 @@ export function generatePermissionDeniedError(agentName: string, targetSubagent?
 
   if (targetSubagent && !policy.subagents_allowed.includes(targetSubagent)) {
     return (
-      `❌ Agent "${agentName}" 没有权限调用SubAgent "${targetSubagent}"\n\n` +
+      `[NO] Agent "${agentName}" 没有权限调用SubAgent "${targetSubagent}"\n\n` +
       `"${agentName}" 只能调用:\n` +
       `  - ${policy.subagents_allowed.join('\n  - ')}\n\n` +
       `原因：权限隔离，确保调用链清晰、可审计。\n\n` +
@@ -182,7 +182,7 @@ export function generatePermissionDeniedError(agentName: string, targetSubagent?
     )
   }
 
-  return `❌ Agent "${agentName}" 的SubAgent调用被拒绝`
+  return `[NO] Agent "${agentName}" 的SubAgent调用被拒绝`
 }
 
 /**
@@ -195,10 +195,10 @@ export function generatePermissionDeniedError(agentName: string, targetSubagent?
  */
 export function generateDirectCallError(agentName: string, targetSubagent: string): string {
   return (
-    `❌ SubAgent调用被拒绝：不能直接调用\n\n` +
+    `[NO] SubAgent调用被拒绝：不能直接调用\n\n` +
     `发现：Agent "${agentName}" 尝试直接调用 opencode.executeAgent("${targetSubagent}", ...)\n\n` +
     `问题：所有SubAgent调用必须通过 call_subagent 工具处理。\n\n` +
-    `✅ 正确的方式：\n` +
+    `[OK] 正确的方式：\n` +
     `  await toolCall('call_subagent', {\n` +
     `    subagent: '${targetSubagent}',\n` +
     `    prompt: '...'\n` +

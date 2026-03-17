@@ -73,19 +73,19 @@
 
 ```
 pending (待执行)
-  ↓
+  [down]
   ├─ [依赖未完成] → 继续等待
   └─ [依赖已完成] → 开始执行
-     ↓
+     [down]
 in_progress (执行中)
-  ↓
+  [down]
   ├─ [成功] → completed
-  │          ↓
+  │          [down]
   │       [验证通过] → 进入下一步
   │       [验证失败] → failed (第1次) → 重做
   │
   └─ [失败] → failed
-            ↓
+            [down]
          [第1次失败] → 重做
          [第2次失败] → 上报皇帝
 ```
@@ -245,7 +245,7 @@ T6 (门下省最终验证完成):
 
 ---
 
-## ✅ 验证流程
+## [OK] 验证流程
 
 ### 门下省的验证流程
 
@@ -312,7 +312,7 @@ def make_decision(verification_result):
 
 ---
 
-## ❌ 错误处理
+## [NO] 错误处理
 
 ### 六部的错误返回格式
 
@@ -336,16 +336,16 @@ def make_decision(verification_result):
 
 | 错误类型 | 代码 | 重试? | 处理方式 |
 |---------|------|-------|---------|
-| 语法错误 | SYNTAX_ERROR | ✅ | 修改参数或方法重试 |
-| 运行时错误 | RUNTIME_ERROR | ✅ | 修改输入或参数重试 |
-| 超时 | TIMEOUT | ✅ | 增加超时时间重试 |
-| 网络错误 | NETWORK_ERROR | ✅ | 等待后重试 |
-| 权限错误 | PERMISSION_ERROR | ❌ | 上报皇帝 |
-| 无法处理 | UNSUPPORTED | ❌ | 上报皇帝 |
+| 语法错误 | SYNTAX_ERROR | [OK] | 修改参数或方法重试 |
+| 运行时错误 | RUNTIME_ERROR | [OK] | 修改输入或参数重试 |
+| 超时 | TIMEOUT | [OK] | 增加超时时间重试 |
+| 网络错误 | NETWORK_ERROR | [OK] | 等待后重试 |
+| 权限错误 | PERMISSION_ERROR | [NO] | 上报皇帝 |
+| 无法处理 | UNSUPPORTED | [NO] | 上报皇帝 |
 
 ---
 
-## 📊 状态管理
+## [chart] 状态管理
 
 ### 全局状态追踪
 
@@ -536,7 +536,7 @@ Step锁：
 
 ---
 
-## 🎯 超时和截止时间
+## [TARGET] 超时和截止时间
 
 ### 超时策略
 

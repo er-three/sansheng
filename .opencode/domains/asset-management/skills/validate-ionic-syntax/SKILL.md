@@ -33,9 +33,9 @@ You are a syntax validator specializing in Ionic framework code quality assuranc
 1. **Component 装饰器**
    ```typescript
    @Component({
-     selector: 'app-xxx',      // ✓ kebab-case
-     templateUrl: '...',       // ✓ 相对路径
-     styleUrls: [...]          // ✓ 可选但规范
+     selector: 'app-xxx',      // [PASS] kebab-case
+     templateUrl: '...',       // [PASS] 相对路径
+     styleUrls: [...]          // [PASS] 可选但规范
    })
    ```
    - [ ] 有 @Component 装饰器
@@ -46,7 +46,7 @@ You are a syntax validator specializing in Ionic framework code quality assuranc
 2. **Service 定义**
    ```typescript
    @Injectable({
-     providedIn: 'root'        // ✓ 现代写法
+     providedIn: 'root'        // [PASS] 现代写法
    })
    ```
    - [ ] 有 @Injectable 装饰器
@@ -79,9 +79,9 @@ You are a syntax validator specializing in Ionic framework code quality assuranc
 
 4. **Ionic 组件**
    ```html
-   <ion-content>        ✓ 正确使用
-   <ion-header>         ✓ 有 ion-toolbar
-   <ion-button>         ✓ 有 expand/fill 属性
+   <ion-content>        [PASS] 正确使用
+   <ion-header>         [PASS] 有 ion-toolbar
+   <ion-button>         [PASS] 有 expand/fill 属性
    ```
    - [ ] ion-* 标签存在
    - [ ] 嵌套结构正确
@@ -152,11 +152,11 @@ You are a syntax validator specializing in Ionic framework code quality assuranc
 - [warning] src/app/components/user-list/user-list.component.ts:42 - subscribe 未使用 takeUntil
 
 **验收标准检查**:
-✅ 所有 Component 都有正确的装饰器
-✅ 所有 Service 都有 @Injectable
-✅ 模板绑定语法正确
-✅ Ionic 组件使用规范
-❌ [可选] 所有 subscribe 都有 takeUntil (仅警告)
+[OK] 所有 Component 都有正确的装饰器
+[OK] 所有 Service 都有 @Injectable
+[OK] 模板绑定语法正确
+[OK] Ionic 组件使用规范
+[NO] [可选] 所有 subscribe 都有 takeUntil (仅警告)
 
 ---
 
@@ -166,13 +166,13 @@ You are a syntax validator specializing in Ionic framework code quality assuranc
 ## 关键验收标准
 
 **必须通过**（PASS 前提）：
-- ✅ 所有 TypeScript 文件无语法错误
-- ✅ 所有 Component 都有 @Component 装饰器
-- ✅ 所有 Service 都有 @Injectable 装饰器
-- ✅ 所有模板绑定表达式语法正确
-- ✅ Ionic 组件标签正确使用
+- [OK] 所有 TypeScript 文件无语法错误
+- [OK] 所有 Component 都有 @Component 装饰器
+- [OK] 所有 Service 都有 @Injectable 装饰器
+- [OK] 所有模板绑定表达式语法正确
+- [OK] Ionic 组件标签正确使用
 
 **可选检查**（仅警告）：
-- ⚠️ 订阅清理（takeUntil）
-- ⚠️ 类型注解完整性
-- ⚠️ 代码注释覆盖率
+- [WARN] 订阅清理（takeUntil）
+- [WARN] 类型注解完整性
+- [WARN] 代码注释覆盖率

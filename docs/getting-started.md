@@ -2,7 +2,7 @@
 
 5 分钟快速上手三省六部治理系统。
 
-## 🎯 目标
+## [TARGET] 目标
 
 本指南将帮助你：
 1. 理解治理系统的核心概念
@@ -130,12 +130,12 @@ const plan: Plan = {
 try {
   const result = await orchestrator.executeCompleteWorkflow('修复登录 bug')
 
-  console.log('✅ 工作流完成')
+  console.log('[OK] 工作流完成')
   console.log('成功率:', result.report.statistics.successRate * 100 + '%')
   console.log('总耗时:', result.report.duration + 'ms')
   console.log('完成步骤:', result.report.completedSteps, '/', result.report.totalSteps)
 } catch (error) {
-  console.error('❌ 工作流失败:', error)
+  console.error('[NO] 工作流失败:', error)
 }
 ```
 
@@ -144,25 +144,25 @@ try {
 ```typescript
 // 阶段 1：规划（中书省）
 const plan = await orchestrator.phase1Planning('修复登录 bug')
-console.log('✅ 计划已制定:', plan.id)
+console.log('[OK] 计划已制定:', plan.id)
 
 // 阶段 2：审核（门下省）
 const approval = await orchestrator.phase2Review(plan)
 if (approval.decision === Decision.PASS) {
-  console.log('✅ 计划已批准')
+  console.log('[OK] 计划已批准')
 } else if (approval.decision === Decision.ESCALATE) {
-  console.error('❌ 计划被拒绝:', approval.reason)
+  console.error('[NO] 计划被拒绝:', approval.reason)
   return
 }
 
 // 阶段 3：执行（尚书省）
 const report = await orchestrator.phase3Execution(plan)
-console.log('✅ 执行完成')
+console.log('[OK] 执行完成')
 console.log('成功率:', report.statistics.successRate)
 
 // 阶段 4：验证（御史台）
 const verification = await orchestrator.phase4Verification(plan, report)
-console.log('✅ 系统验证完成:', verification.status)
+console.log('[OK] 系统验证完成:', verification.status)
 ```
 
 ## 🔍 理解工作流的 5 个阶段
@@ -181,9 +181,9 @@ const plan = await orchestrator.phase1Planning(requirement)
 ```typescript
 const approval = await orchestrator.phase2Review(plan)
 // 检查项：
-// ✓ 步骤结构完整性
-// ✓ 循环依赖检测
-// ✓ 验收标准定义
+// [PASS] 步骤结构完整性
+// [PASS] 循环依赖检测
+// [PASS] 验收标准定义
 // 输出：Decision (PASS / SKIP / RETRY / ESCALATE)
 ```
 
@@ -205,7 +205,7 @@ const report = await orchestrator.phase3Execution(plan)
 步骤1（吏部）┐
 步骤2（户部）├─→ 同时执行（无依赖）
 步骤3（兵部）┘
-    ↓
+    [down]
 步骤4（工部）→ 等所有上一步完成后再执行
 ```
 
@@ -215,9 +215,9 @@ const report = await orchestrator.phase3Execution(plan)
 ```typescript
 const verification = await orchestrator.phase4Verification(plan, report)
 // 验证内容：
-// ✓ 所有步骤成功完成
-// ✓ 无遗留的集成问题
-// ✓ 性能指标满足要求
+// [PASS] 所有步骤成功完成
+// [PASS] 无遗留的集成问题
+// [PASS] 性能指标满足要求
 // 输出：VerificationResult
 ```
 
@@ -291,7 +291,7 @@ if (report.failedSteps > 0) {
 }
 ```
 
-## 📊 查看执行状态
+## [chart] 查看执行状态
 
 ```typescript
 // 获取当前执行状态
@@ -318,7 +318,7 @@ console.log('关键路径:', criticalPath)
 ```typescript
 // 检查循环依赖
 if (orchestrator.hasCyclicDependency(plan)) {
-  console.error('❌ 计划包含循环依赖，无法执行')
+  console.error('[NO] 计划包含循环依赖，无法执行')
   return
 }
 
@@ -422,10 +422,10 @@ const config = {
 ### Q: 为什么我的计划被拒绝了？
 
 A: 常见原因：
-- ❌ 缺少 `uses` 字段
-- ❌ 没有定义 `acceptanceCriteria`
-- ❌ 包含循环依赖
-- ❌ 依赖的步骤不存在
+- [NO] 缺少 `uses` 字段
+- [NO] 没有定义 `acceptanceCriteria`
+- [NO] 包含循环依赖
+- [NO] 依赖的步骤不存在
 
 查看 `approval.reason` 了解具体原因。
 
@@ -439,4 +439,4 @@ A: 常见原因：
 
 - 文档版本：3.0.1
 - 最后更新：2026-03-17
-- 状态：✅ 生产就绪
+- 状态：[OK] 生产就绪

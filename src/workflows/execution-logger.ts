@@ -117,7 +117,7 @@ export function generateExecutionReport(sessionId: string): string {
       const agent = log.agentName.padEnd(12)
       const status = log.output?.status || "unknown"
       const duration = `${log.duration_ms}ms`
-      return `${log.timestamp} | ${agent} | ${status.padEnd(8)} | ${duration.padStart(8)} | ${log.output?.data ? "✓" : "–"}`
+      return `${log.timestamp} | ${agent} | ${status.padEnd(8)} | ${duration.padStart(8)} | ${log.output?.data ? "[PASS]" : "–"}`
     }),
     ``,
     `## Decision Trace`,

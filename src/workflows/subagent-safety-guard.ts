@@ -44,7 +44,7 @@ export function validateSubagentCallDepth(
     return {
       allowed: false,
       reason:
-        `❌ SubAgent嵌套深度已达上限(${maxDepth})，禁止继续调用。\n` +
+        `[NO] SubAgent嵌套深度已达上限(${maxDepth})，禁止继续调用。\n` +
         `当前深度: ${currentDepth}\n` +
         `这样的限制是为了防止无限递归和过度消耗token。\n\n` +
         `调用链太深通常表示：\n` +
@@ -91,7 +91,7 @@ export function detectCycle(
         hasCycle: true,
         cycle,
         reason:
-          `❌ 检测到SubAgent循环调用，已拒绝。\n` +
+          `[NO] 检测到SubAgent循环调用，已拒绝。\n` +
           `循环路径: ${cycle.join(' → ')} → ${agentName}\n\n` +
           `这表示任务陷入死循环：\n` +
           `  - Agent A 调用了 Agent B\n` +
@@ -203,7 +203,7 @@ export function diagnoseDepthIssue(context: SubagentCallContext): string {
   if (depth === maxDepth) {
     return (
       `${summary}\n\n` +
-      `⚠️ 调用栈已达到最大深度限制。\n` +
+      `[WARN] 调用栈已达到最大深度限制。\n` +
       `如果是合法需求，可以考虑：\n` +
       `  1. 重新设计任务，减少SubAgent调用层级\n` +
       `  2. 合并某些SubAgent的职责\n` +

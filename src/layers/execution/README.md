@@ -8,15 +8,15 @@
 
 ```
 用户工作流输入
-      ↓
+      [down]
 [RecipeResolver] 解析 Recipe → 任务图
-      ↓
+      [down]
 [DependencyManager] 验证依赖 → 拓扑排序
-      ↓
+      [down]
 [TaskQueue] 排队管理 → 优先级调度
-      ↓
+      [down]
 [ExecutionCoordinator] 协调执行 → 按顺序调用 Agent
-      ↓
+      [down]
 执行结果 + 错误 → 送到 ResiliencyLayer
 ```
 

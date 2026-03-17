@@ -155,9 +155,9 @@ comm.on('task-completed', (event) => {
 
 ```
 ExecutionLayer ←→ ResiliencyLayer
-      ↓              ↓
+      [down]              [down]
       └────→ ObservabilityLayer
-                      ↓
+                      [down]
                 CommunicationLayer
 ```
 

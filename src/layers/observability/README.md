@@ -8,15 +8,15 @@
 
 ```
 ExecutionLayer 执行任务
-      ↓
+      [down]
 [HeartbeatMonitor] 记录 Agent 活动 → 检测超时
-      ↓
+      [down]
 [AnalyticsCollector] 统计执行指标 → 计算成功率
-      ↓
+      [down]
 [AuditLogger] 持久化审计日志 → 存储到磁盘
-      ↓
+      [down]
 [MetricsAggregator] 聚合所有指标 → 生成报告
-      ↓
+      [down]
 可观测性信息 ← 供 Dashboard/报告使用
 ```
 

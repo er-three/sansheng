@@ -484,7 +484,7 @@ export async function toolExecuteAfterHook(input: Record<string, unknown>, outpu
         // 更新上下文，传递给 SubAgent
         const newContext = pushSubagentContext(context, subagentName)
         log("SubagentControl",
-            `✅ SubAgent 调用通过全部检查 [权限+陷阱] [深度${newContext.depth}/${context.maxDepth}]: ${agentName} → ${subagentName}`,
+            `[OK] SubAgent 调用通过全部检查 [权限+陷阱] [深度${newContext.depth}/${context.maxDepth}]: ${agentName} → ${subagentName}`,
             "info")
       }
     }

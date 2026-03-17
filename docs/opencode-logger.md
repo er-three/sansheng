@@ -2,7 +2,7 @@
 
 **日期**：2026-03-16
 **问题**：日志被打印到终端控制台，而不是 OpenCode 客户端控制台
-**状态**：✅ 已修复
+**状态**：[OK] 已修复
 
 ---
 
@@ -10,9 +10,9 @@
 
 ### 问题表现
 ```
-❌ 日志输出到终端控制台（stdout/stderr）
-❌ 而不是 OpenCode 客户端的控制台
-❌ 用户看不到 Plugin 的运行日志
+[NO] 日志输出到终端控制台（stdout/stderr）
+[NO] 而不是 OpenCode 客户端的控制台
+[NO] 用户看不到 Plugin 的运行日志
 ```
 
 ### 根本原因
@@ -54,7 +54,7 @@ export async function toolExecuteAfterHook(
 
 ---
 
-## ✅ 解决方案
+## [OK] 解决方案
 
 ### 1. 创建专用日志模块
 
@@ -105,20 +105,20 @@ function initializePlugin(context?: PluginContext): void {
 **修复前**：
 ```
 log() 调用
-  ↓
+  [down]
 检查 opencodeClient
-  ├─ 为 null? → 降级到 console.error()  ❌
+  ├─ 为 null? → 降级到 console.error()  [NO]
   └─ 有效? → 调用 client.app.log()
 ```
 
 **修复后**：
 ```
 log() 调用
-  ↓
+  [down]
 检查 opencodeClient (opencode-logger)
   ├─ 为 null? → 降级到 console.log/warn/error()
-  └─ 有效? → 调用 client.app.log()  ✅
-  ↓
+  └─ 有效? → 调用 client.app.log()  [OK]
+  [down]
 所有日志都尝试发送到 OpenCode 控制台
 ```
 
@@ -192,9 +192,9 @@ import { diagnoseLoggerStatus } from "./opencode-logger.js"
 console.log(diagnoseLoggerStatus())
 
 // 检查输出中的 status 字段：
-// ✅ "ready" - 日志会正确发送到 OpenCode
-// ⚠️ "degraded" - 日志会降级到终端
-// ❌ "unavailable" - client 不可用
+// [OK] "ready" - 日志会正确发送到 OpenCode
+// [WARN] "degraded" - 日志会降级到终端
+// [NO] "unavailable" - client 不可用
 ```
 
 ### 方法 3：运行测试
@@ -205,7 +205,7 @@ npm test -- opencode-logger.test.ts
 
 ---
 
-## 📊 问题排查
+## [chart] 问题排查
 
 ### 日志仍然出现在终端？
 
@@ -215,14 +215,14 @@ npm test -- opencode-logger.test.ts
    ```typescript
    // plugin.ts 中添加诊断日志
    export function createPlugin(context?: PluginContext): any {
-     console.error("createPlugin context:", context ? "✓ 有" : "✗ 无")
+     console.error("createPlugin context:", context ? "[PASS] 有" : "✗ 无")
    }
    ```
 
 2. **context 是否被正确传入 initializePlugin？**
    ```typescript
    function initializePlugin(context?: PluginContext): void {
-     console.error("initializePlugin context:", context ? "✓ 有" : "✗ 无")
+     console.error("initializePlugin context:", context ? "[PASS] 有" : "✗ 无")
      if (context) {
        setOpencodeLogClient(context)
      }
@@ -250,7 +250,7 @@ npm test -- opencode-logger.test.ts
 
 ---
 
-## 🎯 关键改进点
+## [TARGET] 关键改进点
 
 ### 改进 1：分离关注点
 - 原来：utils.ts 混合了日志逻辑
@@ -270,7 +270,7 @@ npm test -- opencode-logger.test.ts
 
 ---
 
-## 📝 集成检查清单
+## [note] 集成检查清单
 
 - [ ] 新建 `src/opencode-logger.ts`
 - [ ] 修改 `src/plugin.ts` 导入和初始化
@@ -316,7 +316,7 @@ export function enableCategory(category: string) {
 
 ---
 
-**修复完成！** ✅
+**修复完成！** [OK]
 
 日志现在会被正确路由到 OpenCode 客户端的控制台。
 
@@ -324,4 +324,4 @@ export function enableCategory(category: string) {
 
 **版本**：1.0.0
 **日期**：2026-03-16
-**状态**：✅ 已修复并就绪
+**状态**：[OK] 已修复并就绪

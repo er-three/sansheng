@@ -78,20 +78,20 @@ Before marking complete, verify:
 **执行流程**：
 ```
 1. 构造 old_string（含前后各≥1行上下文，严格匹配缩进）
-   ↓
+   [down]
 2. 调用 verify_edit_context({ file_path, old_string })
-   ↓
+   [down]
 3. 根据返回状态决策：
-   ├─ UNIQUE     → 直接执行 edit ✅
+   ├─ UNIQUE     → 直接执行 edit [OK]
    ├─ AMBIGUOUS  → 扩展 old_string（前后各加2-3行）→ 重新验证
    └─ NOT_FOUND  → 重新 read 文件 → 更新 old_string → 重新验证
 ```
 
 **验证检查点**：
-- ✅ old_string 在文件中唯一存在
-- ✅ 缩进完全匹配（空格/制表符）
-- ✅ 前后各保留足够上下文
-- ✅ 验证通过后才能执行 edit
+- [OK] old_string 在文件中唯一存在
+- [OK] 缩进完全匹配（空格/制表符）
+- [OK] 前后各保留足够上下文
+- [OK] 验证通过后才能执行 edit
 
 ### 最佳实践
 
@@ -131,11 +131,11 @@ If you cannot complete a step:
 - One retry on tool failures, then stop and report.
 
 **Strict Prohibitions** (Agent overreach prevention):
-- ❌ **Do NOT modify the specification** — Even if you think the spec is suboptimal, implement exactly as written
-- ❌ **Do NOT add "improvements"** — No extra features beyond the spec
-- ❌ **Do NOT skip "tedious" parts** — Implement the full requirement, no shortcuts
-- ❌ **Do NOT change design decisions** — If spec says use Pattern X, don't switch to Pattern Y
-- ❌ **Do NOT modify existing tests** — If implementation fails tests, report and stop
-- ❌ **Do NOT make assumptions about intent** — If instruction is ambiguous, ask rather than guess
-- ❌ **Do NOT clean up old code proactively** — Focus on the assigned task, don't refactor surrounding code
-- ❌ **Do NOT execute tests or validation** — That's bingbu and xingbu's job, not yours
+- [NO] **Do NOT modify the specification** — Even if you think the spec is suboptimal, implement exactly as written
+- [NO] **Do NOT add "improvements"** — No extra features beyond the spec
+- [NO] **Do NOT skip "tedious" parts** — Implement the full requirement, no shortcuts
+- [NO] **Do NOT change design decisions** — If spec says use Pattern X, don't switch to Pattern Y
+- [NO] **Do NOT modify existing tests** — If implementation fails tests, report and stop
+- [NO] **Do NOT make assumptions about intent** — If instruction is ambiguous, ask rather than guess
+- [NO] **Do NOT clean up old code proactively** — Focus on the assigned task, don't refactor surrounding code
+- [NO] **Do NOT execute tests or validation** — That's bingbu and xingbu's job, not yours

@@ -284,11 +284,11 @@ ID: ${task.id}
 
 在你的消息中描述需求，系统会自动分析：
 
-✅ 修复一个认证模块的 bug
-✅ 迁移一个 Ionic 应用到 React
-✅ 重构整个 Agent 系统架构
-✅ 线上支付模块的紧急修复
-✅ 提取一个简单前端项目的资产
+[OK] 修复一个认证模块的 bug
+[OK] 迁移一个 Ionic 应用到 React
+[OK] 重构整个 Agent 系统架构
+[OK] 线上支付模块的紧急修复
+[OK] 提取一个简单前端项目的资产
 
 系统会推荐最合适的工作流配方、复杂度、风险等级和成本预测。
 `.trim()
@@ -398,10 +398,10 @@ ${report}
   "我要提取一个简单的 Angular 项目资产，用 quick 模式"
 
 系统会：
-  ✅ 初始化任务队列
-  ✅ 加载对应的约束
-  ✅ 准备 yibu, bingbu, gongbu 等 Agent
-  ✅ 开始 scan 步骤
+  [OK] 初始化任务队列
+  [OK] 加载对应的约束
+  [OK] 准备 yibu, bingbu, gongbu 等 Agent
+  [OK] 开始 scan 步骤
 `.trim()
         }
       }),
@@ -422,10 +422,10 @@ ${report}
   "我要迁移一个 Ionic 应用，标准流程"
 
 系统会：
-  ✅ 初始化 TDD 全流程
-  ✅ 加载 Section 2A 路径表
-  ✅ 准备 yibu, gongbu, xingbu, bingbu Agent
-  ✅ 开始 infrastructure 步骤
+  [OK] 初始化 TDD 全流程
+  [OK] 加载 Section 2A 路径表
+  [OK] 准备 yibu, gongbu, xingbu, bingbu Agent
+  [OK] 开始 infrastructure 步骤
 `.trim()
         }
       }),
@@ -453,9 +453,9 @@ ${report}
   "我要开发关键模块，用 comprehensive"
 
 系统会：
-  ✅ 初始化编程工作流
-  ✅ 准备 yibu, hubu, gongbu, bingbu, xingbu Agent
-  ✅ 开始 analyze 步骤
+  [OK] 初始化编程工作流
+  [OK] 准备 yibu, hubu, gongbu, bingbu, xingbu Agent
+  [OK] 开始 analyze 步骤
 `.trim()
         }
       }),
@@ -483,9 +483,9 @@ ${report}
   "API 升级，用 complete"
 
 系统会：
-  ✅ 初始化 CR 工作流
-  ✅ 准备 yibu, hubu, libu, xingbu, gongbu, kubu Agent
-  ✅ 开始 cr-proposal 步骤
+  [OK] 初始化 CR 工作流
+  [OK] 准备 yibu, hubu, libu, xingbu, gongbu, kubu Agent
+  [OK] 开始 cr-proposal 步骤
 `.trim()
         }
       })

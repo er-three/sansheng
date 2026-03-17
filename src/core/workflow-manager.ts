@@ -119,9 +119,9 @@ export class WorkflowManager implements IWorkflowManager {
       this.communication = await this.initializeCommunication()
 
       this.initialized = true
-      log('WorkflowManager', '✅ Initialization complete', 'info')
+      log('WorkflowManager', '[OK] Initialization complete', 'info')
     } catch (error) {
-      log('WorkflowManager', `❌ Initialization failed: ${String(error)}`, 'error')
+      log('WorkflowManager', `[NO] Initialization failed: ${String(error)}`, 'error')
       throw error
     }
   }

@@ -232,7 +232,7 @@ export function generateHealthReport(sessionId: string): string {
     "Agent Health Report",
     "═══════════════════════════════════════════",
     "",
-    "📊 Summary",
+    "[chart] Summary",
     `  - Total Agents: ${allAgents.length}`,
     `  - Healthy: ${healthyCount}`,
     `  - Idle: ${idleCount}`,
@@ -242,7 +242,7 @@ export function generateHealthReport(sessionId: string): string {
   ]
 
   if (timedOutTasks.length > 0) {
-    lines.push("⚠️ Timed Out Tasks")
+    lines.push("[WARN] Timed Out Tasks")
     timedOutTasks.forEach(task => {
       lines.push(`  - ${task.id}: ${task.name} (claimed by ${task.claimedBy})`)
     })
@@ -260,7 +260,7 @@ export function generateHealthReport(sessionId: string): string {
   lines.push("📋 Agent Details")
   allAgents.forEach(agent => {
     const status =
-      agent.status === "healthy" ? "✓" : agent.status === "timeout" ? "⚠" : "✗"
+      agent.status === "healthy" ? "[PASS]" : agent.status === "timeout" ? "⚠" : "✗"
     lines.push(`  ${status} ${agent.agentName}`)
     lines.push(`     Status: ${agent.status}`)
     lines.push(`     Last Activity: ${new Date(agent.lastActivity).toISOString()}`)

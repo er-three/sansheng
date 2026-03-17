@@ -17,8 +17,8 @@ bash scripts/detect-framework-code.sh openspec/specs/{module_name}/{module_name}
 ```
 
 ## 判断标准
-- 全部返回 0 → ✅ 通过，进入下一步
-- 任何项有返回 → ❌ 停止，定位问题资产，回退对应步骤重新提取
+- 全部返回 0 → [OK] 通过，进入下一步
+- 任何项有返回 → [NO] 停止，定位问题资产，回退对应步骤重新提取
 
 ## 不通过时的处理
 - `ui.yaml` 检测失败 → 回退兵部（extract），重新执行 extract-ui

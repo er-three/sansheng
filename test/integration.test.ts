@@ -390,4 +390,4 @@ describe("Performance Benchmarks - 性能基准", () => {
   })
 })
 
-console.log("\n✅ All integration tests passed!")
+console.log("\n[OK] All integration tests passed!")

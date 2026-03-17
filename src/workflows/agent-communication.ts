@@ -349,7 +349,7 @@ export function generateCommunicationReport(sessionId: string): string {
   ]
 
   if (activeAgents.length > 0) {
-    lines.push("✓ Active Agents")
+    lines.push("[PASS] Active Agents")
     activeAgents.forEach(agent => {
       const lastPoll = agent.lastPolled
         ? new Date(agent.lastPolled).toISOString()
@@ -374,7 +374,7 @@ export function generateCommunicationReport(sessionId: string): string {
   lines.push("")
 
   if (waitTimeViolations.length > 0 || executionTimeViolations.length > 0) {
-    lines.push("⚠️ SLA Violations")
+    lines.push("[WARN] SLA Violations")
     if (waitTimeViolations.length > 0) {
       lines.push(`  - Wait Time Violations: ${waitTimeViolations.length}`)
       waitTimeViolations.forEach(task => {
@@ -390,7 +390,7 @@ export function generateCommunicationReport(sessionId: string): string {
     lines.push("")
   }
 
-  lines.push("📊 Task Queue Status")
+  lines.push("[chart] Task Queue Status")
   if (queue) {
     lines.push(`  - Total Tasks: ${queue.tasks.length}`)
     lines.push(`  - Pending: ${queue.tasks.filter(t => t.status === "pending").length}`)

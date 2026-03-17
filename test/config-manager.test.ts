@@ -253,4 +253,4 @@ describe("Phase 4 - ConfigManager 变量替换", () => {
   })
 })
 
-console.log("\n✅ Phase 4 ConfigManager 测试全部通过！")
+console.log("\n[OK] Phase 4 ConfigManager 测试全部通过！")

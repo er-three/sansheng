@@ -126,10 +126,10 @@
     "ionic_components_correct": true
   },
   "recommendations": [
-    "✓ 所有 Component 都有正确的装饰器",
-    "✓ 所有 Service 都有 @Injectable 装饰器",
-    "✓ 所有模板绑定语法正确",
-    "✓ Ionic 组件使用规范",
+    "[PASS] 所有 Component 都有正确的装饰器",
+    "[PASS] 所有 Service 都有 @Injectable 装饰器",
+    "[PASS] 所有模板绑定语法正确",
+    "[PASS] Ionic 组件使用规范",
     "⚠ 建议在 3 处添加 takeUntil 来清理订阅",
     "⚠ 建议为 1 处方法添加返回类型注解"
   ]

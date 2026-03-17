@@ -138,18 +138,18 @@ export function generateValidationReport(sessionId: string): string {
     "Dependency Validation Report",
     "═══════════════════════════════════════════",
     "",
-    `Status: ${result.valid ? "✓ Valid" : "✗ Invalid"}`,
+    `Status: ${result.valid ? "[PASS] Valid" : "✗ Invalid"}`,
     ""
   ]
 
   if (result.errors.length > 0) {
-    lines.push("❌ Errors")
+    lines.push("[NO] Errors")
     result.errors.forEach(e => lines.push(`  - ${e}`))
     lines.push("")
   }
 
   if (result.warnings.length > 0) {
-    lines.push("⚠️ Warnings")
+    lines.push("[WARN] Warnings")
     result.warnings.forEach(w => lines.push(`  - ${w}`))
   }
 
